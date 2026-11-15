@@ -1,0 +1,28 @@
+{
+  "domain": "home_rhythm",
+  "name": "Home Rhythm",
+  "after_dependencies": [
+    "climate",
+    "input_select",
+    "binary_sensor",
+    "automation",
+    "script",
+    "scene"
+  ],
+  "codeowners": [
+    "@think-now-ideas"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "http",
+    "frontend",
+    "websocket_api"
+  ],
+  "documentation": "https://github.com/think-now-ideas/homeRhythm",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/think-now-ideas/homeRhythm/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.9.13"
+}

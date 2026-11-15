@@ -1,0 +1,156 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Home Rhythm – Hausmodi",
+        "description": "Which helpers define the house modes?",
+        "data": {
+          "season_entity": "Season entity",
+          "winter_values": "Values that mean heating season (comma separated)",
+          "vacation_entity": "Vacation / house mode entity",
+          "away_value": "Value for 'away'",
+          "home_value": "Value for 'vacation at home'",
+          "workday_entity": "Workday sensor (holidays)",
+          "away_temp": "Temperature while away",
+          "cool_values": "Seasons with cooling (comma separated)",
+          "presence_entity": "Presence (e.g. zone.home)",
+          "summer_value": "Value for summer (automatic season)",
+          "holiday_as": "Heating on public holidays like",
+          "vacation_as": "Heating during 'vacation at home' like"
+        }
+      },
+      "energy": {
+        "title": "Home Rhythm – Energie",
+        "description": "For rooms with an air conditioner: Home Rhythm compares gas and electricity and heats with the cheaper source.",
+        "data": {
+          "outdoor_entities": "Outdoor temperature sensors or weather",
+          "outdoor_aggregate": "Combine several sensors",
+          "outdoor_minutes": "Average outdoor temperature over",
+          "gas_price": "Gas price per kWh",
+          "gas_price_entity": "Gas price from entity (optional)",
+          "boiler_efficiency": "Boiler efficiency",
+          "power_price": "Electricity price per kWh",
+          "power_price_entity": "Electricity price from entity (optional)",
+          "hysteresis": "Switching hysteresis",
+          "winter_below": "Automatic season: winter below (3-day mean)",
+          "hot_above": "Automatic season: heat phase above (3-day mean)"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Home Rhythm",
+        "menu_options": {
+          "modes": "House modes",
+          "energy": "Energy: outdoor temperature and prices"
+        }
+      },
+      "modes": {
+        "title": "House modes",
+        "description": "Which helpers define the house modes?",
+        "data": {
+          "season_entity": "Season entity",
+          "winter_values": "Values that mean heating season (comma separated)",
+          "vacation_entity": "Vacation / house mode entity",
+          "away_value": "Value for 'away'",
+          "home_value": "Value for 'vacation at home'",
+          "workday_entity": "Workday sensor (holidays)",
+          "away_temp": "Temperature while away",
+          "cool_values": "Seasons with cooling (comma separated)",
+          "presence_entity": "Presence (e.g. zone.home)",
+          "summer_value": "Value for summer (automatic season)",
+          "holiday_as": "Heating on public holidays like",
+          "vacation_as": "Heating during 'vacation at home' like"
+        }
+      },
+      "energy": {
+        "title": "Energy",
+        "description": "For rooms with an air conditioner: Home Rhythm compares gas and electricity and heats with the cheaper source.",
+        "data": {
+          "outdoor_entities": "Outdoor temperature sensors or weather",
+          "outdoor_aggregate": "Combine several sensors",
+          "outdoor_minutes": "Average outdoor temperature over",
+          "gas_price": "Gas price per kWh",
+          "gas_price_entity": "Gas price from entity (optional)",
+          "boiler_efficiency": "Boiler efficiency",
+          "power_price": "Electricity price per kWh",
+          "power_price_entity": "Electricity price from entity (optional)",
+          "hysteresis": "Switching hysteresis",
+          "winter_below": "Automatic season: winter below (3-day mean)",
+          "hot_above": "Automatic season: heat phase above (3-day mean)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "outdoor_aggregate": {
+      "options": {
+        "mean": "Mean",
+        "min": "Coldest sensor"
+      }
+    },
+    "day_as": {
+      "options": {
+        "wd": "Mon–Fri",
+        "sa": "Saturday",
+        "so": "Sunday"
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "event": {
+        "name": "Event",
+        "state": {
+          "keins": "none",
+          "party": "Party",
+          "gaeste": "Guests"
+        }
+      }
+    },
+    "switch": {
+      "season_auto": {
+        "name": "Automatic season"
+      }
+    }
+  },
+  "services": {
+    "set_exception": {
+      "name": "Set exception",
+      "description": "A level for one room from … to … (the schedule applies outside). Replaces an existing exception.",
+      "fields": {
+        "room": {
+          "name": "Room",
+          "description": "Name or ID of the Home Rhythm room"
+        },
+        "level": {
+          "name": "Level",
+          "description": "Level name, e.g. Komfort"
+        },
+        "start": {
+          "name": "Start",
+          "description": "Empty = now"
+        },
+        "end": {
+          "name": "End",
+          "description": "When the schedule applies again (max. 14 days ahead)"
+        }
+      }
+    },
+    "clear_exception": {
+      "name": "Clear exception",
+      "description": "Back to the schedule for this room.",
+      "fields": {
+        "room": {
+          "name": "Room",
+          "description": "Name or ID of the Home Rhythm room"
+        }
+      }
+    }
+  }
+}

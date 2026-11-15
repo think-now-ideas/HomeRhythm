@@ -1,0 +1,27 @@
+set_exception:
+  fields:
+    room:
+      required: true
+      example: "Arbeitszimmer EG"
+      selector:
+        text:
+    level:
+      required: true
+      example: "Homeoffice"
+      selector:
+        text:
+    start:
+      required: false
+      selector:
+        datetime:
+    end:
+      required: true
+      selector:
+        datetime:
+clear_exception:
+  fields:
+    room:
+      required: true
+      example: "Arbeitszimmer EG"
+      selector:
+        text:

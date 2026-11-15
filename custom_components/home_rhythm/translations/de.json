@@ -1,0 +1,156 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Home Rhythm – Hausmodi",
+        "description": "Welche Helfer bestimmen die Hausmodi? Räume und Zeiten richtest du danach in der Home-Rhythm-Karte ein.",
+        "data": {
+          "season_entity": "Jahreszeit (Entität)",
+          "winter_values": "Werte, bei denen geheizt wird (kommagetrennt)",
+          "vacation_entity": "Urlaub / Hausmodus (Entität)",
+          "away_value": "Wert für „Urlaub unterwegs“",
+          "home_value": "Wert für „Urlaub zu Hause“",
+          "workday_entity": "Arbeitstag-Sensor (Feiertage)",
+          "away_temp": "Temperatur bei Urlaub unterwegs",
+          "cool_values": "Jahreszeiten, in denen gekühlt wird (kommagetrennt, leer = nie)",
+          "presence_entity": "Anwesenheit (z. B. zone.home – 0 Personen = niemand zu Hause)",
+          "summer_value": "Wert für Sommer (für „Jahreszeit automatisch“)",
+          "holiday_as": "Heizung an Feiertagen wie",
+          "vacation_as": "Heizung bei „Urlaub zu Hause“ wie"
+        }
+      },
+      "energy": {
+        "title": "Home Rhythm – Energie",
+        "description": "Für Räume mit Klimaanlage: Home Rhythm vergleicht Gas und Strom und heizt mit der günstigeren Quelle. Preise in Cent pro kWh; Entitäten in €/kWh werden umgerechnet. Brennwertkessel ca. 90–98 %, älterer Kessel 80–90 %.",
+        "data": {
+          "outdoor_entities": "Außentemperatur – ein oder mehrere Sensoren oder Wetter",
+          "outdoor_aggregate": "Mehrere Sensoren zusammenfassen",
+          "outdoor_minutes": "Außentemperatur mitteln über",
+          "gas_price": "Gaspreis pro kWh (Arbeitspreis)",
+          "gas_price_entity": "Gaspreis aus Entität (optional, ersetzt den Wert oben)",
+          "boiler_efficiency": "Wirkungsgrad Gastherme",
+          "power_price": "Strompreis pro kWh (Arbeitspreis)",
+          "power_price_entity": "Strompreis aus Entität (optional, z. B. dynamischer Tarif)",
+          "hysteresis": "Schaltabstand um die Schwelle",
+          "winter_below": "Jahreszeit automatisch: Winter, wenn Ø 3 Tage unter",
+          "hot_above": "Jahreszeit automatisch: Heißphase, wenn Ø 3 Tage über"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Home Rhythm",
+        "menu_options": {
+          "modes": "Hausmodi",
+          "energy": "Energie: Außentemperatur und Preise"
+        }
+      },
+      "modes": {
+        "title": "Hausmodi",
+        "description": "Welche Helfer bestimmen die Hausmodi?",
+        "data": {
+          "season_entity": "Jahreszeit (Entität)",
+          "winter_values": "Werte, bei denen geheizt wird (kommagetrennt)",
+          "vacation_entity": "Urlaub / Hausmodus (Entität)",
+          "away_value": "Wert für „Urlaub unterwegs“",
+          "home_value": "Wert für „Urlaub zu Hause“",
+          "workday_entity": "Arbeitstag-Sensor (Feiertage)",
+          "away_temp": "Temperatur bei Urlaub unterwegs",
+          "cool_values": "Jahreszeiten, in denen gekühlt wird (kommagetrennt, leer = nie)",
+          "presence_entity": "Anwesenheit (z. B. zone.home – 0 Personen = niemand zu Hause)",
+          "summer_value": "Wert für Sommer (für „Jahreszeit automatisch“)",
+          "holiday_as": "Heizung an Feiertagen wie",
+          "vacation_as": "Heizung bei „Urlaub zu Hause“ wie"
+        }
+      },
+      "energy": {
+        "title": "Energie",
+        "description": "Für Räume mit Klimaanlage: Home Rhythm vergleicht Gas und Strom und heizt mit der günstigeren Quelle. Preise in Cent pro kWh; Entitäten in €/kWh werden umgerechnet. Brennwertkessel ca. 90–98 %, älterer Kessel 80–90 %.",
+        "data": {
+          "outdoor_entities": "Außentemperatur – ein oder mehrere Sensoren oder Wetter",
+          "outdoor_aggregate": "Mehrere Sensoren zusammenfassen",
+          "outdoor_minutes": "Außentemperatur mitteln über",
+          "gas_price": "Gaspreis pro kWh (Arbeitspreis)",
+          "gas_price_entity": "Gaspreis aus Entität (optional, ersetzt den Wert oben)",
+          "boiler_efficiency": "Wirkungsgrad Gastherme",
+          "power_price": "Strompreis pro kWh (Arbeitspreis)",
+          "power_price_entity": "Strompreis aus Entität (optional, z. B. dynamischer Tarif)",
+          "hysteresis": "Schaltabstand um die Schwelle",
+          "winter_below": "Jahreszeit automatisch: Winter, wenn Ø 3 Tage unter",
+          "hot_above": "Jahreszeit automatisch: Heißphase, wenn Ø 3 Tage über"
+        }
+      }
+    }
+  },
+  "selector": {
+    "outdoor_aggregate": {
+      "options": {
+        "mean": "Mittelwert",
+        "min": "Kältester Sensor"
+      }
+    },
+    "day_as": {
+      "options": {
+        "wd": "Mo–Fr",
+        "sa": "Samstag",
+        "so": "Sonntag"
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "event": {
+        "name": "Ereignis",
+        "state": {
+          "keins": "keins",
+          "party": "Party",
+          "gaeste": "Gäste"
+        }
+      }
+    },
+    "switch": {
+      "season_auto": {
+        "name": "Jahreszeit automatisch"
+      }
+    }
+  },
+  "services": {
+    "set_exception": {
+      "name": "Ausnahme setzen",
+      "description": "Eine Stufe für einen Raum von … bis … (außerhalb gilt der Plan). Ersetzt eine bestehende Ausnahme.",
+      "fields": {
+        "room": {
+          "name": "Raum",
+          "description": "Name oder ID des Raums in Home Rhythm"
+        },
+        "level": {
+          "name": "Stufe",
+          "description": "Name der Stufe, z. B. Komfort oder Homeoffice"
+        },
+        "start": {
+          "name": "Beginn",
+          "description": "Leer = sofort"
+        },
+        "end": {
+          "name": "Ende",
+          "description": "Zeitpunkt, an dem wieder der Plan gilt (höchstens 14 Tage voraus)"
+        }
+      }
+    },
+    "clear_exception": {
+      "name": "Ausnahme beenden",
+      "description": "Zurück zum Plan für diesen Raum.",
+      "fields": {
+        "room": {
+          "name": "Raum",
+          "description": "Name oder ID des Raums in Home Rhythm"
+        }
+      }
+    }
+  }
+}
