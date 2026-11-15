@@ -109,7 +109,7 @@ async def test_area_resolution(state, page):
 async def test_knopf_render_and_grid(state, page):
     snap, a = state
     await page.evaluate("([s, c]) => addCards(s, c)", [snap, [
-        {"area": a["kueche"], "layout": "knopf", "navigation_path": "/homecockpit-v1/kueche"},
+        {"area": a["kueche"], "layout": "knopf", "navigation_path": "/mein-dashboard/kueche"},
         {"area": a["bad"], "layout": "knopf", "name": "Badezimmer", "icon": "mdi:shower"},
         {"area": a["kueche"]},
     ]])
@@ -131,12 +131,12 @@ async def test_knopf_render_and_grid(state, page):
 async def test_knopf_clicks_and_dialog_on_top(state, page):
     snap, a = state
     await page.evaluate("([s, c]) => addCards(s, c)", [snap, [
-        {"area": a["kueche"], "layout": "knopf", "navigation_path": "/homecockpit-v1/kueche"},
+        {"area": a["kueche"], "layout": "knopf", "navigation_path": "/mein-dashboard/kueche"},
         {"area": a["bad"], "layout": "knopf"},
     ]])
     await page.wait_for_timeout(200)
     await page.click("#c0 >> .ktx")
-    assert await page.evaluate("() => NAV") == ["/homecockpit-v1/kueche"]
+    assert await page.evaluate("() => NAV") == ["/mein-dashboard/kueche"]
     await page.click("#c0 >> button.kico")
     await page.wait_for_timeout(100)
     d = await page.evaluate("""() => { const dl = document.getElementById('c0').shadowRoot.getElementById('qdlg');

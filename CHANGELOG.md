@@ -1,5 +1,8 @@
 # Änderungen
 
+## 0.9.14 – neutraler Beispielpfad
+- README und Test nennen als Beispiel für `navigation_path` den neutralen Pfad `/mein-dashboard/kueche`. Keine Funktionsänderung.
+
 ## 0.9.13 – Raumkarte für HomeCockpit
 - **`area:` statt `room:`** – die Karte sucht den Home-Rhythm-Raum mit diesem Bereich (bei mehreren den ersten);
   `room:` hat Vorrang. Ohne passenden Raum nur eine kleine Zeile „kein Home-Rhythm-Raum“ statt Fehlerkasten.

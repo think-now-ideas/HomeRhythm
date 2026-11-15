@@ -1,6 +1,6 @@
 /* Home Rhythm – Karte für Home Assistant (ohne Build-Schritt, ohne Abhängigkeiten). */
 (() => {
-  const VERSION = "0.9.13";
+  const VERSION = "0.9.14";
   const DAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const DAY_TYPES = [["wd", "Mo–Fr"], ["sa", "Samstag"], ["so", "So / Feiertag"]];
   const COLORS = {

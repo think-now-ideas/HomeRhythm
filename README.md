@@ -276,7 +276,7 @@ oder Bereich.
 type: custom:home-rhythm-card
 area: kueche
 layout: knopf
-navigation_path: /homecockpit-v1/kueche   # optional
+navigation_path: /mein-dashboard/kueche   # optional
 name: Küche                               # optional, statt Raumname
 icon: mdi:stove                           # optional, mdi-Symbol statt Emoji
 ```
