@@ -1,8 +1,8 @@
 """Abläufe optional als echte Home-Assistant-Automation anlegen.
 
 Ist bei einem Ablauf „Auch als Automation in Home Assistant anlegen“ eingeschaltet,
-übersetzt Home Rhythm ihn in eine Automation und schreibt sie in ``automations.yaml``
-(dieselbe Datei, die der Automations-Editor von HA benutzt). Home Rhythm führt den
+übersetzt HomeRhythm ihn in eine Automation und schreibt sie in ``automations.yaml``
+(dieselbe Datei, die der Automations-Editor von HA benutzt). HomeRhythm führt den
 Ablauf dann *nicht* selbst aus – sonst würde doppelt geschaltet.
 
 Sicherheit und Datenschutz:
@@ -10,7 +10,7 @@ Sicherheit und Datenschutz:
   entfernt. Alle anderen Automationen bleiben unverändert erhalten.
 * Vor jedem Schreiben wird die Datei vollständig eingelesen und geprüft (muss eine
   Liste sein). Ist sie unlesbar, wird nichts geschrieben.
-* Vor jedem Schreiben legt Home Rhythm eine Sicherung ``automations.yaml.home_rhythm.bak``
+* Vor jedem Schreiben legt HomeRhythm eine Sicherung ``automations.yaml.home_rhythm.bak``
   der vorherigen Fassung an. Nutzt die Datei ``!include`` oder ``!secret``, wird nichts geschrieben.
 * Geschrieben wird atomar (temporäre Datei + Umbenennen), danach ``automation.reload``.
 * Es werden keine vom Nutzer eingegebenen Templates erzeugt; die wenigen Templates
@@ -139,7 +139,7 @@ def _days_cond_base(p: dict[str, Any], opts: dict[str, Any]) -> dict[str, Any] |
 
 
 def _type_cond(types: list[str], opts: dict[str, Any]) -> dict[str, Any]:
-    """Tagesarten als HA-Bedingung. Feiertag = Workday „aus“ an einem Werktag (wie Home Rhythm für heute)."""
+    """Tagesarten als HA-Bedingung. Feiertag = Workday „aus“ an einem Werktag (wie HomeRhythm für heute)."""
     names = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
     wd = {"condition": "time", "weekday": list(names[:5])}
     ent = opts.get("workday_entity")
@@ -252,7 +252,7 @@ def react_automation(fid: str, flow: dict[str, Any], opts: dict[str, Any]) -> di
             if s.get("after"):
                 actions.append({"delay": {"seconds": s["after"]}})
         elif do == "blink":
-            # wie in Home Rhythm selbst: alle aus – Pause – alle an – Pause
+            # wie in HomeRhythm selbst: alle aus – Pause – alle an – Pause
             ms = s.get("pause", 5) * 100
             seq = [_service("off", e) for e in s["entities"]] + [{"delay": {"milliseconds": ms}}]
             seq += [_service("on", e) for e in s["entities"]] + [{"delay": {"milliseconds": ms}}]
@@ -312,7 +312,7 @@ def build(fid: str, flow: dict[str, Any], devices: list[str], opts: dict[str, An
     body = plan_automation(fid, flow, devices, opts) if flow["type"] == "plan" else react_automation(fid, flow, opts)
     return {
         "id": ID_PREFIX + fid,
-        "alias": f"Home Rhythm: {flow['name']}",
+        "alias": f"Home Rhythm: {flow['name']}",  # bleibt so: sonst würden bestehende Automationen umbenannt
         "description": "Verwaltet von Home Rhythm – bitte in der Home-Rhythm-Karte bearbeiten, Änderungen hier werden beim nächsten Speichern überschrieben.",
         **body,
     }
@@ -325,12 +325,12 @@ def _read(path: str) -> list[dict[str, Any]]:
         raw = fh.read()
     if "!include" in raw or "!secret" in raw:
         # Beim Zurückschreiben würden eingebundene Dateien bzw. Geheimnisse aufgelöst – lieber gar nicht schreiben.
-        raise ValueError("automations.yaml nutzt !include oder !secret – Home Rhythm schreibt dort nichts hinein")
+        raise ValueError("automations.yaml nutzt !include oder !secret – HomeRhythm schreibt dort nichts hinein")
     data = yaml_util.load_yaml(path)
     if data is None:
         return []
     if not isinstance(data, list):
-        raise ValueError("automations.yaml hat ein unerwartetes Format – Home Rhythm schreibt nichts hinein")
+        raise ValueError("automations.yaml hat ein unerwartetes Format – HomeRhythm schreibt nichts hinein")
     return data
 
 
@@ -353,4 +353,4 @@ async def async_sync(hass: HomeAssistant, wanted: dict[str, dict[str, Any]]) -> 
     changed = await hass.async_add_executor_job(_write, path, wanted)
     if changed and hass.services.has_service("automation", "reload"):
         await hass.services.async_call("automation", "reload", blocking=True)
-        _LOGGER.info("Home Rhythm: %d Automation(en) in automations.yaml aktualisiert", len(wanted))
+        _LOGGER.info("HomeRhythm: %d Automation(en) in automations.yaml aktualisiert", len(wanted))

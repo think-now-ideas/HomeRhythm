@@ -1,5 +1,26 @@
 # Änderungen
 
+## 0.9.15 – Grenzen an Sonnenzeiten
+- **„frühestens“ und „spätestens“ an jeder Sonnenzeit** im einfachen Zeitplan – beim Öffnen/Einschalten und beim
+  Schließen/Ausschalten, für Rollläden, Licht und Steckdosen und an bestimmten Tagen. Beispiel: „Sonnenuntergang
+  + 1 Std., nicht vor 18:00, spätestens 23:00“. Liegt die Sonnenzeit vor „frühestens“, wird zu dieser Uhrzeit
+  geschaltet (nicht gar nicht). Bisher bot der Editor beim Öffnen nur „frühestens“ und beim Schließen nur
+  „spätestens“; die Ausführung konnte beides schon.
+- Knopf **„+ Grenzen“** neben dem Versatz; sind Grenzen gesetzt, zeigt er sie („18:00 – 23:00 ✎“). „heute ≈ …“
+  nennt, welche Grenze heute greift.
+- **Jahresband** unter einer Sonnenzeit mit Grenzen: an welchen Tagen welche Grenze greift („frühestens 18:00 greift
+  ca. 27.10.–27.1.“, „spätestens 23:00 greift nie“), aufklappbar zum Jahresverlauf. Die Sonnenzeiten fürs ganze Jahr
+  kommen mit der Editor-Vorschau (`sun_year`, Standort von Home Assistant).
+- Zusammenfassung des Zeitplans nennt die Grenzen („zu: Sonnenuntergang +1 Std. (18:00–23:00)“).
+- **Absicherung** sagt, ob sie gilt – und wenn nicht, warum (z. B. „ohne ‚spätestens‘ kann die Sonnenzeit später sein“).
+- **Hinweis „Art passt nicht zu den Thermostaten“** – z. B. Art „FRITZ!DECT“, aber das Thermostat ist ein
+  Zigbee-Gerät (typisch nach einem Tausch). Im Raum mit Knopf „Auf … umstellen“ und „ist gewollt“; im Raum-Editor
+  als Hinweis. Neuer WebSocket `home_rhythm/room/kind` (nur Admins). Nur eindeutige Fälle, „andere
+  Regel-Integration“ wird nicht beanstandet.
+- Anzeigename **HomeRhythm** (Integration, HACS, Karte, Texte). Domain `home_rhythm`, Entitäts-IDs, Gerätename
+  und die Namen bereits angelegter HA-Automationen bleiben. Links in `manifest.json` auf `think-now-ideas/HomeRhythm`.
+- Prüf-Action „Prüfen“ führt jetzt auch alle Tests aus (pytest, Karte in Chromium).
+
 ## 0.9.14 – neutraler Beispielpfad
 - README und Test nennen als Beispiel für `navigation_path` den neutralen Pfad `/mein-dashboard/kueche`. Keine Funktionsänderung.
 

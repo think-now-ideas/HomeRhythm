@@ -1,6 +1,6 @@
-/* Home Rhythm – Karte für Home Assistant (ohne Build-Schritt, ohne Abhängigkeiten). */
+/* HomeRhythm – Karte für Home Assistant (ohne Build-Schritt, ohne Abhängigkeiten). */
 (() => {
-  const VERSION = "0.9.14";
+  const VERSION = "0.9.15";
   const DAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const DAY_TYPES = [["wd", "Mo–Fr"], ["sa", "Samstag"], ["so", "So / Feiertag"]];
   const COLORS = {
@@ -10,10 +10,10 @@
   };
   const RT_KINDS = [["fritz", "FRITZ!DECT"], ["bt", "Better Thermostat"], ["integration", "andere Regel-Integration"], ["direct", "Thermostat direkt (Sonoff & Co.)"]];
   const RT_KIND_HINT = {
-    fritz: "Fritz-Thermostate, die Home Rhythm direkt steuert.",
-    bt: "Better Thermostat regelt; Home Rhythm setzt nur den Sollwert.",
-    integration: "z. B. Versatile Thermostat – die Integration regelt; Home Rhythm setzt nur den Sollwert.",
-    direct: "Zigbee- und andere Thermostate, die Home Rhythm direkt steuert – auch mit Raumsensor.",
+    fritz: "Fritz-Thermostate, die HomeRhythm direkt steuert.",
+    bt: "Better Thermostat regelt; HomeRhythm setzt nur den Sollwert.",
+    integration: "z. B. Versatile Thermostat – die Integration regelt; HomeRhythm setzt nur den Sollwert.",
+    direct: "Zigbee- und andere Thermostate, die HomeRhythm direkt steuert – auch mit Raumsensor.",
   };
   const MANUAL_MODES = [["next", "bis zum nächsten Wechsel im Plan"], ["30", "30 Minuten"], ["60", "1 Stunde"], ["120", "2 Stunden"], ["240", "4 Stunden"]];
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -63,7 +63,7 @@
   };
   const fmtNum = (v, d = 1) => (v == null ? "–" : Number(v).toLocaleString("de-DE", { maximumFractionDigits: d }));
   const AC_MODES = [["auto", "automatisch – billigere Quelle"], ["ac", "Klima bevorzugt"], ["radiator", "immer Heizkörper (Klima aus)"]];
-  const WORDMARK = `<svg class="hrword" viewBox="14 22 2812 754" fill="currentColor" role="img" aria-label="Home Rhythm"><path fill="#faaf40" d="M932.36,383.13L476.11,27.59,19.86,383.13l131.46,3.42,5.88,315.73c42.41-131.84,166.07-227.25,312-227.25s262.05,89.69,307.9,215.32l-4.59-309.63,159.85,2.41ZM469.2,409.08h-92.66v-92.66h92.66v92.66ZM469.2,302.61h-92.66v-92.64h92.66v92.64ZM575.67,409.08h-92.66v-92.66h92.66v92.66ZM575.67,302.61h-92.66v-92.64h92.66v92.64Z"/><g><path fill="#faaf40" fill-rule="evenodd" d="M313.83,524.54h0c3.62-2.09,8.29-.83,10.38,2.79l37.06,64.19c2.1,3.63.84,8.29-2.78,10.39-3.63,2.09-8.29.84-10.39-2.79l-37.06-64.19c-2.09-3.62-.84-8.29,2.79-10.39"/><path fill="#faaf40" fill-rule="evenodd" d="M205.64,632.73h0c2.1-3.63,6.77-4.88,10.39-2.79l64.19,37.06c3.63,2.1,4.88,6.77,2.79,10.39-2.09,3.63-6.76,4.88-10.39,2.78l-64.2-37.06c-3.62-2.09-4.87-6.76-2.78-10.38Z"/><path fill="#faaf40" fill-rule="evenodd" d="M717.57,632.73h0c2.09,3.62.84,8.29-2.78,10.38l-64.2,37.06c-3.62,2.1-8.29.85-10.39-2.78-2.09-3.63-.84-8.29,2.79-10.38l64.19-37.07c3.63-2.09,8.3-.84,10.39,2.79Z"/><path fill="#faaf40" fill-rule="evenodd" d="M609.38,524.54h0c3.62,2.1,4.87,6.77,2.79,10.39l-37.06,64.19c-2.09,3.63-6.77,4.88-10.39,2.79-3.62-2.09-4.88-6.76-2.78-10.39l37.06-64.19c2.1-3.62,6.76-4.88,10.38-2.79Z"/><path fill="#faaf40" fill-rule="evenodd" d="M461.6,484.94h0c4.18,0,7.6,3.42,7.61,7.6v74.14c0,4.18-3.43,7.6-7.61,7.6s-7.6-3.42-7.6-7.6v-74.14c0-4.18,3.42-7.6,7.6-7.6Z"/><path fill="#faaf40" fill-rule="evenodd" d="M386.34,499.6c-1.51.4-2.42,1.99-2.02,3.5l10.97,40.91c1.82-.51,3.67-1,5.51-1.47l-10.96-40.92c-.4-1.51-1.99-2.42-3.5-2.02Z"/><path fill="#faaf40" fill-rule="evenodd" d="M255.97,574.87c-1.11,1.11-1.11,2.93,0,4.04l30.01,30c1.33-1.36,2.68-2.71,4.04-4.04l-30-30c-1.11-1.11-2.93-1.11-4.04,0Z"/><path fill="#faaf40" fill-rule="evenodd" d="M742.51,705.24c-.41-1.5-2-2.42-3.5-2.02l-40.92,10.96c.51,1.83,1.01,3.67,1.48,5.51l40.92-10.96c1.5-.4,2.42-1.99,2.02-3.5Z"/><path fill="#faaf40" fill-rule="evenodd" d="M667.24,574.87c-1.11-1.11-2.93-1.11-4.04,0l-30,30c1.35,1.33,2.7,2.68,4.03,4.04l30-30c1.11-1.11,1.11-2.94,0-4.04Z"/><path fill="#faaf40" fill-rule="evenodd" d="M225.12,714.19l-40.92-10.97c-1.51-.4-3.1.52-3.5,2.02-.41,1.5.51,3.1,2.02,3.5l40.92,10.96c.47-1.85.96-3.69,1.48-5.51Z"/><path fill="#faaf40" fill-rule="evenodd" d="M536.87,499.6c-1.51-.41-3.09.51-3.5,2.02l-10.96,40.92c1.85.47,3.69.96,5.52,1.48l10.96-40.92c.4-1.51-.52-3.1-2.02-3.5Z"/></g><g><path d="M859.31,442.82v108.35h135.71v-108.35h17.51v245.88h-17.51v-122.94h-135.71v122.94h-17.51v-245.88h17.51Z"/><path d="M1114.31,692.72c-45.24,0-80.26-35.39-80.26-90.11,0-59.83,39.4-93.03,82.81-93.03,48.52,0,81.35,36.48,81.35,90.11,0,64.94-44.87,93.03-83.54,93.03h-.36ZM1115.4,678.12c36.48,0,65.3-32.83,65.3-77.7,0-32.1-17.88-76.25-64.21-76.25s-64.94,39.76-64.94,77.34c0,43.78,27.73,76.61,63.48,76.61h.37Z"/><path d="M1218.65,555.55c0-16.05-.37-28.09-1.46-41.95h16.42l1.09,30.64h.73c11.31-20.06,28.09-34.66,56.91-34.66,24.08,0,42.68,16.05,50.34,37.94h.73c4.74-10.21,11.31-18.24,17.88-23.71,11.31-9.12,22.98-14.23,41.59-14.23,17.15,0,57.27,9.48,57.27,75.88v103.24h-17.51v-101.78c0-39.4-15.32-62.75-45.6-62.75-21.89,0-39.04,16.42-45.97,34.66-1.46,5.11-2.92,10.94-2.92,17.51v112.36h-17.51v-109.81c0-31.37-14.96-54.72-43.41-54.72-23.35,0-41.95,18.97-48.52,39.4-1.46,5.11-2.55,10.94-2.55,17.15v107.98h-17.51v-133.15Z"/><path d="M1496.99,599.33c0,55.82,30.64,78.07,66.76,78.07,25.54,0,38.67-5.11,48.52-9.85l4.38,13.5c-6.57,3.65-24.44,11.31-55.09,11.31-50.34,0-81.72-36.48-81.72-87.92,0-58.37,33.56-94.85,78.8-94.85,57.27,0,68.22,53.99,68.22,79.16,0,4.74,0,7.3-.73,10.58h-129.14ZM1608.62,585.46c.36-24.44-9.85-61.29-52.17-61.29-38.67,0-55.09,34.29-58.37,61.29h110.54Z"/><path d="M1659.51,446.47c17.15-3.28,41.95-5.47,67.85-5.47,35.39,0,59.1,5.84,75.88,19.7,13.5,11.31,21.16,28.46,21.16,49.61,0,31.74-21.52,53.26-44.87,61.29v1.09c17.88,6.57,28.46,23.71,34.29,47.42,8.03,30.64,14.59,59.1,19.33,68.58h-45.97c-3.65-7.3-9.85-27.36-16.42-58-7.3-32.1-18.6-42.32-44.14-43.05h-22.62v101.05h-44.51v-242.23ZM1704.02,554.82h26.63c30.28,0,48.88-16.05,48.88-40.49,0-26.63-18.61-39.4-47.79-39.4-14.23,0-23.35,1.09-27.72,2.19v77.7Z"/><path d="M1859.39,429.33h44.87v105.79h.73c5.47-8.39,13.13-15.32,22.25-20.06,9.12-5.11,19.7-8.03,31.01-8.03,30.28,0,62.02,20.06,62.02,76.97v104.7h-44.87v-99.96c0-25.54-9.49-45.24-34.29-45.24-17.51,0-29.91,11.67-35.02,25.17-1.46,4.01-1.82,8.75-1.82,13.5v106.52h-44.87v-259.38Z"/><path d="M2080.64,511.04l31.74,95.21c3.65,10.94,7.66,24.44,10.21,34.29h1.09c2.55-9.85,5.84-23.35,9.49-34.66l27.73-94.85h47.79l-44.51,121.12c-24.44,66.39-40.86,95.94-61.65,114.18-17.88,15.32-36.12,21.16-47.06,22.62l-10.21-37.58c7.66-1.82,16.78-5.84,25.9-12.4,8.39-5.47,18.61-16.05,24.81-28.09,1.46-3.28,2.55-5.84,2.55-8.03,0-1.82-.37-4.38-2.19-8.75l-65.3-163.07h49.61Z"/><path d="M2289.79,465.44v45.6h42.68v33.56h-42.68v78.07c0,21.89,5.84,32.83,22.98,32.83,8.03,0,12.4-.37,17.51-1.82l.73,33.93c-6.57,2.55-18.61,4.74-32.47,4.74-16.78,0-30.28-5.47-38.67-14.59-9.85-10.21-14.23-26.63-14.23-49.98v-83.18h-25.17v-33.56h25.17v-33.2l44.14-12.4Z"/><path d="M2357.39,429.33h44.87v105.79h.73c5.47-8.39,13.13-15.32,22.25-20.06,9.12-5.11,19.7-8.03,31.01-8.03,30.28,0,62.02,20.06,62.02,76.97v104.7h-44.87v-99.96c0-25.54-9.49-45.24-34.29-45.24-17.51,0-29.91,11.67-35.02,25.17-1.46,4.01-1.82,8.75-1.82,13.5v106.52h-44.87v-259.38Z"/><path d="M2556.87,563.94c0-20.43-.73-37.58-1.46-52.9h38.3l2.19,26.27h1.09c8.39-13.86,24.44-30.28,54.72-30.28,23.35,0,41.59,13.13,49.25,32.83h.73c6.2-9.85,13.5-17.15,21.52-22.25,10.21-6.93,21.52-10.58,36.48-10.58,29.18,0,59.1,20.06,59.1,76.97v104.7h-43.78v-98.13c0-29.55-10.21-47.06-31.74-47.06-15.32,0-26.63,10.94-31.37,23.71-1.46,4.01-2.19,9.85-2.19,14.96v106.52h-43.78v-102.88c0-24.81-9.85-42.32-30.64-42.32-16.78,0-28.09,13.13-32.47,25.17-1.46,4.74-2.19,9.85-2.19,14.96v105.06h-43.78v-124.76Z"/></g></svg>`;
+  const WORDMARK = `<svg class="hrword" viewBox="14 22 2812 754" fill="currentColor" role="img" aria-label="HomeRhythm"><path fill="#faaf40" d="M932.36,383.13L476.11,27.59,19.86,383.13l131.46,3.42,5.88,315.73c42.41-131.84,166.07-227.25,312-227.25s262.05,89.69,307.9,215.32l-4.59-309.63,159.85,2.41ZM469.2,409.08h-92.66v-92.66h92.66v92.66ZM469.2,302.61h-92.66v-92.64h92.66v92.64ZM575.67,409.08h-92.66v-92.66h92.66v92.66ZM575.67,302.61h-92.66v-92.64h92.66v92.64Z"/><g><path fill="#faaf40" fill-rule="evenodd" d="M313.83,524.54h0c3.62-2.09,8.29-.83,10.38,2.79l37.06,64.19c2.1,3.63.84,8.29-2.78,10.39-3.63,2.09-8.29.84-10.39-2.79l-37.06-64.19c-2.09-3.62-.84-8.29,2.79-10.39"/><path fill="#faaf40" fill-rule="evenodd" d="M205.64,632.73h0c2.1-3.63,6.77-4.88,10.39-2.79l64.19,37.06c3.63,2.1,4.88,6.77,2.79,10.39-2.09,3.63-6.76,4.88-10.39,2.78l-64.2-37.06c-3.62-2.09-4.87-6.76-2.78-10.38Z"/><path fill="#faaf40" fill-rule="evenodd" d="M717.57,632.73h0c2.09,3.62.84,8.29-2.78,10.38l-64.2,37.06c-3.62,2.1-8.29.85-10.39-2.78-2.09-3.63-.84-8.29,2.79-10.38l64.19-37.07c3.63-2.09,8.3-.84,10.39,2.79Z"/><path fill="#faaf40" fill-rule="evenodd" d="M609.38,524.54h0c3.62,2.1,4.87,6.77,2.79,10.39l-37.06,64.19c-2.09,3.63-6.77,4.88-10.39,2.79-3.62-2.09-4.88-6.76-2.78-10.39l37.06-64.19c2.1-3.62,6.76-4.88,10.38-2.79Z"/><path fill="#faaf40" fill-rule="evenodd" d="M461.6,484.94h0c4.18,0,7.6,3.42,7.61,7.6v74.14c0,4.18-3.43,7.6-7.61,7.6s-7.6-3.42-7.6-7.6v-74.14c0-4.18,3.42-7.6,7.6-7.6Z"/><path fill="#faaf40" fill-rule="evenodd" d="M386.34,499.6c-1.51.4-2.42,1.99-2.02,3.5l10.97,40.91c1.82-.51,3.67-1,5.51-1.47l-10.96-40.92c-.4-1.51-1.99-2.42-3.5-2.02Z"/><path fill="#faaf40" fill-rule="evenodd" d="M255.97,574.87c-1.11,1.11-1.11,2.93,0,4.04l30.01,30c1.33-1.36,2.68-2.71,4.04-4.04l-30-30c-1.11-1.11-2.93-1.11-4.04,0Z"/><path fill="#faaf40" fill-rule="evenodd" d="M742.51,705.24c-.41-1.5-2-2.42-3.5-2.02l-40.92,10.96c.51,1.83,1.01,3.67,1.48,5.51l40.92-10.96c1.5-.4,2.42-1.99,2.02-3.5Z"/><path fill="#faaf40" fill-rule="evenodd" d="M667.24,574.87c-1.11-1.11-2.93-1.11-4.04,0l-30,30c1.35,1.33,2.7,2.68,4.03,4.04l30-30c1.11-1.11,1.11-2.94,0-4.04Z"/><path fill="#faaf40" fill-rule="evenodd" d="M225.12,714.19l-40.92-10.97c-1.51-.4-3.1.52-3.5,2.02-.41,1.5.51,3.1,2.02,3.5l40.92,10.96c.47-1.85.96-3.69,1.48-5.51Z"/><path fill="#faaf40" fill-rule="evenodd" d="M536.87,499.6c-1.51-.41-3.09.51-3.5,2.02l-10.96,40.92c1.85.47,3.69.96,5.52,1.48l10.96-40.92c.4-1.51-.52-3.1-2.02-3.5Z"/></g><g><path d="M859.31,442.82v108.35h135.71v-108.35h17.51v245.88h-17.51v-122.94h-135.71v122.94h-17.51v-245.88h17.51Z"/><path d="M1114.31,692.72c-45.24,0-80.26-35.39-80.26-90.11,0-59.83,39.4-93.03,82.81-93.03,48.52,0,81.35,36.48,81.35,90.11,0,64.94-44.87,93.03-83.54,93.03h-.36ZM1115.4,678.12c36.48,0,65.3-32.83,65.3-77.7,0-32.1-17.88-76.25-64.21-76.25s-64.94,39.76-64.94,77.34c0,43.78,27.73,76.61,63.48,76.61h.37Z"/><path d="M1218.65,555.55c0-16.05-.37-28.09-1.46-41.95h16.42l1.09,30.64h.73c11.31-20.06,28.09-34.66,56.91-34.66,24.08,0,42.68,16.05,50.34,37.94h.73c4.74-10.21,11.31-18.24,17.88-23.71,11.31-9.12,22.98-14.23,41.59-14.23,17.15,0,57.27,9.48,57.27,75.88v103.24h-17.51v-101.78c0-39.4-15.32-62.75-45.6-62.75-21.89,0-39.04,16.42-45.97,34.66-1.46,5.11-2.92,10.94-2.92,17.51v112.36h-17.51v-109.81c0-31.37-14.96-54.72-43.41-54.72-23.35,0-41.95,18.97-48.52,39.4-1.46,5.11-2.55,10.94-2.55,17.15v107.98h-17.51v-133.15Z"/><path d="M1496.99,599.33c0,55.82,30.64,78.07,66.76,78.07,25.54,0,38.67-5.11,48.52-9.85l4.38,13.5c-6.57,3.65-24.44,11.31-55.09,11.31-50.34,0-81.72-36.48-81.72-87.92,0-58.37,33.56-94.85,78.8-94.85,57.27,0,68.22,53.99,68.22,79.16,0,4.74,0,7.3-.73,10.58h-129.14ZM1608.62,585.46c.36-24.44-9.85-61.29-52.17-61.29-38.67,0-55.09,34.29-58.37,61.29h110.54Z"/><path d="M1659.51,446.47c17.15-3.28,41.95-5.47,67.85-5.47,35.39,0,59.1,5.84,75.88,19.7,13.5,11.31,21.16,28.46,21.16,49.61,0,31.74-21.52,53.26-44.87,61.29v1.09c17.88,6.57,28.46,23.71,34.29,47.42,8.03,30.64,14.59,59.1,19.33,68.58h-45.97c-3.65-7.3-9.85-27.36-16.42-58-7.3-32.1-18.6-42.32-44.14-43.05h-22.62v101.05h-44.51v-242.23ZM1704.02,554.82h26.63c30.28,0,48.88-16.05,48.88-40.49,0-26.63-18.61-39.4-47.79-39.4-14.23,0-23.35,1.09-27.72,2.19v77.7Z"/><path d="M1859.39,429.33h44.87v105.79h.73c5.47-8.39,13.13-15.32,22.25-20.06,9.12-5.11,19.7-8.03,31.01-8.03,30.28,0,62.02,20.06,62.02,76.97v104.7h-44.87v-99.96c0-25.54-9.49-45.24-34.29-45.24-17.51,0-29.91,11.67-35.02,25.17-1.46,4.01-1.82,8.75-1.82,13.5v106.52h-44.87v-259.38Z"/><path d="M2080.64,511.04l31.74,95.21c3.65,10.94,7.66,24.44,10.21,34.29h1.09c2.55-9.85,5.84-23.35,9.49-34.66l27.73-94.85h47.79l-44.51,121.12c-24.44,66.39-40.86,95.94-61.65,114.18-17.88,15.32-36.12,21.16-47.06,22.62l-10.21-37.58c7.66-1.82,16.78-5.84,25.9-12.4,8.39-5.47,18.61-16.05,24.81-28.09,1.46-3.28,2.55-5.84,2.55-8.03,0-1.82-.37-4.38-2.19-8.75l-65.3-163.07h49.61Z"/><path d="M2289.79,465.44v45.6h42.68v33.56h-42.68v78.07c0,21.89,5.84,32.83,22.98,32.83,8.03,0,12.4-.37,17.51-1.82l.73,33.93c-6.57,2.55-18.61,4.74-32.47,4.74-16.78,0-30.28-5.47-38.67-14.59-9.85-10.21-14.23-26.63-14.23-49.98v-83.18h-25.17v-33.56h25.17v-33.2l44.14-12.4Z"/><path d="M2357.39,429.33h44.87v105.79h.73c5.47-8.39,13.13-15.32,22.25-20.06,9.12-5.11,19.7-8.03,31.01-8.03,30.28,0,62.02,20.06,62.02,76.97v104.7h-44.87v-99.96c0-25.54-9.49-45.24-34.29-45.24-17.51,0-29.91,11.67-35.02,25.17-1.46,4.01-1.82,8.75-1.82,13.5v106.52h-44.87v-259.38Z"/><path d="M2556.87,563.94c0-20.43-.73-37.58-1.46-52.9h38.3l2.19,26.27h1.09c8.39-13.86,24.44-30.28,54.72-30.28,23.35,0,41.59,13.13,49.25,32.83h.73c6.2-9.85,13.5-17.15,21.52-22.25,10.21-6.93,21.52-10.58,36.48-10.58,29.18,0,59.1,20.06,59.1,76.97v104.7h-43.78v-98.13c0-29.55-10.21-47.06-31.74-47.06-15.32,0-26.63,10.94-31.37,23.71-1.46,4.01-2.19,9.85-2.19,14.96v106.52h-43.78v-102.88c0-24.81-9.85-42.32-30.64-42.32-16.78,0-28.09,13.13-32.47,25.17-1.46,4.74-2.19,9.85-2.19,14.96v105.06h-43.78v-124.76Z"/></g></svg>`;
   const LOGO = `<svg class="hrlogo" viewBox="12 118 928 706" aria-hidden="true"><path fill="#faaf40" d="M932.36,482.22L476.11,126.67,19.86,482.22l131.46,3.42,5.88,315.73c42.41-131.84,166.07-227.25,312-227.25s262.05,89.69,307.9,215.32l-4.59-309.63,159.85,2.41ZM469.2,508.17h-92.66v-92.66h92.66v92.66ZM469.2,401.69h-92.66v-92.64h92.66v92.64ZM575.67,508.17h-92.66v-92.66h92.66v92.66ZM575.67,401.69h-92.66v-92.64h92.66v92.64Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M319.37,626.54h0c3.49-2.01,7.98-.8,9.99,2.68l35.67,61.79c2.02,3.49.81,7.98-2.68,10-3.49,2.01-7.98.81-10-2.68l-35.67-61.78c-2.01-3.48-.81-7.98,2.68-10"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M215.24,730.67h0c2.02-3.49,6.51-4.69,10-2.68l61.79,35.67c3.49,2.02,4.69,6.51,2.68,10-2.02,3.49-6.51,4.69-10,2.68l-61.79-35.67c-3.48-2.01-4.69-6.51-2.68-9.99Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M707.97,730.67h0c2.01,3.48.81,7.98-2.68,9.99l-61.79,35.67c-3.49,2.02-7.98.81-10-2.68-2.01-3.49-.81-7.98,2.68-9.99l61.79-35.68c3.49-2.01,7.99-.81,10,2.68Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M603.84,626.54h0c3.49,2.02,4.69,6.52,2.68,10l-35.67,61.78c-2.02,3.49-6.51,4.69-10,2.68-3.48-2.02-4.69-6.51-2.68-10l35.67-61.79c2.02-3.49,6.5-4.69,9.99-2.68Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M461.6,588.43h0c4.03,0,7.32,3.29,7.32,7.32v71.36c0,4.03-3.3,7.32-7.32,7.32s-7.32-3.29-7.32-7.32v-71.36c0-4.03,3.29-7.32,7.32-7.32Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M389.16,602.54c-1.45.38-2.33,1.92-1.95,3.37l10.56,39.38c1.76-.49,3.53-.97,5.31-1.42l-10.55-39.39c-.39-1.45-1.92-2.33-3.37-1.94Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M263.68,674.99c-1.07,1.07-1.07,2.82,0,3.89l28.88,28.88c1.28-1.31,2.58-2.61,3.89-3.89l-28.88-28.88c-1.07-1.07-2.82-1.07-3.89,0Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M731.98,800.46c-.39-1.44-1.93-2.33-3.37-1.94l-39.39,10.55c.49,1.76.97,3.53,1.42,5.31l39.39-10.55c1.45-.39,2.33-1.92,1.95-3.37Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M659.53,674.99c-1.07-1.07-2.82-1.07-3.89,0l-28.87,28.88c1.3,1.28,2.6,2.58,3.88,3.89l28.88-28.88c1.07-1.07,1.07-2.83,0-3.89Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M233.99,809.08l-39.39-10.56c-1.45-.38-2.98.5-3.37,1.95-.39,1.44.49,2.98,1.94,3.37l39.38,10.55c.45-1.78.93-3.55,1.43-5.31Z"/><path fill="#faaf40" stroke="#faaf40" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" d="M534.05,602.54c-1.45-.39-2.98.49-3.37,1.94l-10.55,39.39c1.78.45,3.55.93,5.31,1.43l10.55-39.39c.39-1.45-.5-2.98-1.95-3.37Z"/></svg>`;
   const SCOL = { open: "#f2c94c", closed: "#4b5d8f", pos: "#8fb3cf", on: "#faaf40", off: "var(--divider-color)",
     none: "repeating-linear-gradient(135deg,#b8bcc4 0 4px,#e3e5e9 4px 8px)" };
@@ -630,6 +630,18 @@
     .reacthint { margin-top:10px; border:1px dashed var(--divider-color); border-radius:10px; padding:8px 10px; font-size:12.5px; color:var(--secondary-text-color); }
     .srl .inp { width:auto; flex:0 1 auto; } .srl input[type=number], .srl input.off { width:64px; } .srl input.tm { width:66px; }
     .srl .calc { color:var(--secondary-text-color); font-size:12px; }
+    /* 0.9.15: Grenzen „frühestens / spätestens“ an Sonnenzeiten (Entwurf „Grenzen“, Variante B) */
+    .limchip { font:inherit; font-size:12.5px; border:1px dashed var(--divider-color); border-radius:14px; background:none; color:var(--secondary-text-color); padding:3px 10px; min-height:30px; cursor:pointer; white-space:nowrap; }
+    .limchip.set { border-style:solid; color:var(--primary-text-color); background:var(--secondary-background-color); }
+    .srl.slim .lb2 { color:var(--secondary-text-color); font-size:12.5px; }
+    .limerr { color:var(--error-color,#c62828); font-size:12.5px; padding-left:10px; }
+    .syear { padding-left:10px; display:grid; gap:3px; }
+    .syear .yband { height:8px; border-radius:4px; background:var(--divider-color); }
+    .syear .ymon { display:flex; justify-content:space-between; font-size:10.5px; color:var(--secondary-text-color); }
+    .syear .ytxt { font-size:12.5px; color:var(--secondary-text-color); }
+    .syear .ye { color:#2f7fd8; font-weight:600; } .syear .yl { color:#8a4fd0; font-weight:600; }
+    .syear svg { width:100%; height:auto; display:block; margin-top:4px; }
+    .guardl small.no { color:var(--warning-color,#b26a00); }
     .sent { font-size:12.5px; color:#2e5d3a; background:rgba(61,154,91,.12); border-radius:8px; padding:4px 8px; justify-self:start; }
     .unit { font-size:12.5px; color:var(--secondary-text-color); }
     .empty-bar { opacity:.4; }
@@ -935,7 +947,7 @@
         }
       } catch (e) {
         this._error = e && e.code === "unknown_command"
-          ? "Home Rhythm ist noch nicht eingerichtet (Einstellungen → Geräte & Dienste → Integration hinzufügen → Home Rhythm)."
+          ? "HomeRhythm ist noch nicht eingerichtet (Einstellungen → Geräte & Dienste → Integration hinzufügen → HomeRhythm)."
           : (e && e.message) || String(e);
       }
       this._render();
@@ -1065,7 +1077,7 @@
       main.innerHTML = `
         <div class="top">
           <div class="title">${this._config.title ? `${LOGO}${esc(this._config.title)}` : WORDMARK}
-            ${this._admin ? `<button class="gear" data-a="nav" data-v="/config/integrations/integration/home_rhythm" title="Home Rhythm in Home Assistant konfigurieren (Hausmodi, Energie)">⚙️</button>` : ""}</div>
+            ${this._admin ? `<button class="gear" data-a="nav" data-v="/config/integrations/integration/home_rhythm" title="HomeRhythm in Home Assistant konfigurieren (Hausmodi, Energie)">⚙️</button>` : ""}</div>
           <div class="tabs">${tabs.map(([k, n, sh]) => `<button data-a="tab" data-v="${k}" class="${this._tab === k ? "on" : ""}"><span class="l">${n}</span><span class="s">${sh}</span></button>`).join("")}</div>
         </div>
         ${(views[this._tab] || views.overview)()}`;
@@ -1141,9 +1153,10 @@
 
     _attentionWhy(r) {
       const c = r.climate || {};
-      if (!r.enabled) return "pausiert – Home Rhythm steuert nicht";
+      if (!r.enabled) return "pausiert – HomeRhythm steuert nicht";
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return "Thermostat nicht erreichbar";
       if ((r.hints || []).length) return "wird auch von anderer Stelle gesteuert";
+      if (r.kind_hint) return "Art passt nicht zu den Thermostaten";
       const bad = (r.devices || []).filter((x) => x.battery_low || !x.available);
       if (bad.length) return bad.map((x) => `${x.name}: ${x.available ? "Batterie schwach" : "nicht erreichbar"}`).join(" · ");
       if (this._mismatch(r)) return "Thermostat steht anders als geplant";
@@ -1213,7 +1226,7 @@
       const soll = off ? "aus" : fmtTemp(pend != null ? pend : r.temperature);
       const lvl = room.manual ? "hand" : (r.level || "aus");
       const m = room.manual;
-      const line = !room.enabled ? "pausiert – Home Rhythm steuert nicht" : noHeat ? "keine Heizung"
+      const line = !room.enabled ? "pausiert – HomeRhythm steuert nicht" : noHeat ? "keine Heizung"
         : m ? `✋ ${m.source && m.source !== "Raumkarte" ? esc(m.source.replace(/^Raumkarte: /, "")) : "Hand-Änderung"} · gilt bis ${fmtTime(m.until)}`
         : `${esc(r.reason || "")}${r.until ? ` · bis ${fmtTime(r.until)}` : ""}${r.next_level_name ? ` → ${esc(r.next_level_name)}` : ""}`;
       const lvlChip = noHeat ? "" : `<span class="lvl" style="background:${COLORS[lvl] || "#888"}">${esc(m ? "Hand" : (r.level_name || lvl))}</span>`;
@@ -1267,7 +1280,7 @@
       const ist = room.room_temp && room.room_temp.value != null ? room.room_temp.value : cl.current_temperature;
       const flags = [
         room.today || room.active_rule ? `<span class="star" title="${esc(room.today ? room.today.label || "heute anders" : room.active_rule)}">★</span>` : "",
-        (room.hints || []).length || cl.state === "unavailable" || cl.state === "unknown" || cl.some_unavailable ? `<span class="warnmark" title="${esc(this._attentionWhy(room) || "auffällig")}">⚠</span>` : "",
+        (room.hints || []).length || room.kind_hint || cl.state === "unavailable" || cl.state === "unknown" || cl.some_unavailable ? `<span class="warnmark" title="${esc(this._attentionWhy(room) || "auffällig")}">⚠</span>` : "",
         (room.devices || []).some((x) => x.battery_low) ? `<span class="batmark" title="Batterie schwach">🔋</span>` : "",
       ].join("");
       const soll = r.hvac_mode === "off" ? "aus" : fmtTemp(r.temperature);
@@ -1371,7 +1384,7 @@
       if (!(room.climates || []).length) return (room.devices || []).some((x) => x.battery_low || !x.available);
       if (!room.enabled) return true;
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return true;
-      if (r.rule === "man" || room.manual || (room.hints || []).length) return true;
+      if (r.rule === "man" || room.manual || (room.hints || []).length || room.kind_hint) return true;
       if ((room.devices || []).some((x) => x.battery_low || !x.available)) return true;
       return this._mismatch(room);
     }
@@ -1425,7 +1438,7 @@
       const lvl = r.level || "aus";
       const noHeat = !(room.climates || []).length;
       const planned = room.today && room.today.planned ? ` · ⏱ ab ${fmtTime(room.today.start)}: ${room.today.label}` : "";
-      const reason = !room.enabled ? "pausiert – Home Rhythm steuert nicht" : noHeat ? "keine Heizung" : `${r.reason || ""}${until}${planned}`;
+      const reason = !room.enabled ? "pausiert – HomeRhythm steuert nicht" : noHeat ? "keine Heizung" : `${r.reason || ""}${until}${planned}`;
       return `<div class="room ${open ? "open" : ""}">
         <div class="row" data-a="toggle" data-v="${esc(room.id)}">
           ${noHeat ? `<span class="ico" title="${esc(icoTitle)}">${ico}</span>` : `<button class="ico icob" data-a="ctl" data-v="${esc(room.id)}" title="${esc(icoTitle)} – Thermostat einstellen">${ico}</button>`}
@@ -1501,7 +1514,7 @@
         ${this._rtHtml(room)}
         ${this._todayHtml(room)}
         ${this._foreignHtml(room)}
-        ${mismatch ? `<div class="warnbox">Das Thermostat steht noch nicht auf dem Sollwert. Funk-Thermostate übernehmen Werte oft erst nach einigen Minuten; Home Rhythm sendet nach 10 Minuten erneut.</div>` : ""}
+        ${mismatch ? `<div class="warnbox">Das Thermostat steht noch nicht auf dem Sollwert. Funk-Thermostate übernehmen Werte oft erst nach einigen Minuten; HomeRhythm sendet nach 10 Minuten erneut.</div>` : ""}
         <div class="week" id="wk-${esc(room.id)}">${this._previews[room.id] ? this._weekHtml(this._previews[room.id]) : `<span></span><span class="hint">Woche wird geladen …</span>`}</div>
         <div class="histhd"><b>Verlauf</b>${[[24, "24 h"], [72, "3 Tage"], [168, "7 Tage"]].map(([h, n]) => `<button class="seg ${this._histHours === h ? "on" : ""}" data-a="histh" data-v="${h}">${n}</button>`).join("")}</div>
         <div class="hist" data-room="${esc(room.id)}"></div>
@@ -1675,14 +1688,25 @@
       return true;
     }
 
+    // 0.9.15: Art des Raums passt nicht zu den Thermostaten (z. B. nach einem Tausch FRITZ!DECT → Zigbee)
+    _kindHintHtml(room, inEditor = false) {
+      const h = room.kind_hint;
+      if (!h) return "";
+      const name = (k) => (RT_KINDS.find(([x]) => x === k) || [, k])[1];
+      return `<div class="warnbox kindhint">⚠ <b>Art „${esc(name(h.kind))}“ passt nicht zu den Thermostaten</b> – erkannt: <b>${esc(name(h.suggest))}</b>.
+        ${h.kind === "fritz" && h.suggest === "direct" ? "HomeRhythm schickt so keinen Raumwert; das Thermostat regelt nach seinem eigenen Fühler." : "Typisch nach einem Thermostat-Tausch."}
+        ${this._admin && !inEditor ? `<div class="hbtns" style="margin-top:6px"><button class="btn sm pri" data-a="kindset" data-v="${esc(room.id)}" data-k="${esc(h.suggest)}">Auf „${esc(name(h.suggest))}“ umstellen</button>
+          <button class="btn sm" data-a="dismiss" data-v="${esc(h.id)}">ist gewollt</button></div>` : ""}</div>`;
+    }
+
     _foreignHtml(room) {
       const hints = room.hints || [], log = room.foreign || [];
-      if (!hints.length && !log.length && !room.dismissed_count) return "";
+      if (!hints.length && !log.length && !room.dismissed_count) return this._kindHintHtml(room);
       const devName = (eid) => this._climateName(eid);
       const hintRow = (h) => `<div class="hintrow"><span>⚠ ${esc(h.text)}${(room.climates || []).length > 1 ? ` <small>(${esc(devName(h.entity_id))})</small>` : ""}</span>
         <span class="hbtns">${h.config_id && h.source && h.source.startsWith("automation.") ? `<button class="btn sm" data-a="nav" data-v="/config/automation/edit/${esc(h.config_id)}">Öffnen</button>` : h.source && h.source.startsWith("script.") ? `<button class="btn sm" data-a="nav" data-v="/config/script/edit/${esc(h.source.split(".")[1])}">Öffnen</button>` : ""}
         ${this._admin ? `<button class="btn sm" data-a="dismiss" data-v="${esc(h.id)}">ist gewollt</button>` : ""}</span></div>`;
-      return `<div class="foreign">
+      return `${this._kindHintHtml(room)}<div class="foreign">
         ${hints.length ? `<div class="fh">Wird auch von anderer Stelle gesteuert</div>${hints.map(hintRow).join("")}` : ""}
         ${room.dismissed_count && this._admin ? `<button class="linkbtn" data-a="resethints" data-v="${esc(room.id)}">${room.dismissed_count} ausgeblendete${room.dismissed_count > 1 ? "" : "n"} Hinweis${room.dismissed_count > 1 ? "e" : ""} wieder zeigen</button>` : ""}
         ${log.length ? `<details data-room="${esc(room.id)}" ${this._openLogs.has(room.id) ? "open" : ""}><summary>Zuletzt von außen geändert (${log.length})</summary>${log.map((e) => `<div class="logrow"><span>${esc(fmtTime(e.at))}</span><span>${esc(devName(e.entity_id))}</span><b>${esc(e.value)}</b><span>${esc(e.name)}${e.note ? ` · <i>${esc(e.note)}</i>` : ""}</span></div>`).join("")}</details>` : ""}
@@ -1749,11 +1773,11 @@
         <div class="setg">
           <div class="tile setc"><span class="sico">🧭</span><div><b>Hausmodi, Helfer &amp; Energie</b><div class="hint">Jahreszeit, Urlaub, Arbeitstag, Anwesenheit, Außensensoren, Gas- und Strompreis</div></div>
             <button class="btn" data-a="nav" data-v="/config/integrations/integration/home_rhythm">In HA öffnen</button></div>
-          <div class="tile setc"><span class="sico">🗂️</span><div><b>Start-Reiter</b><div class="hint">Mit welchem Reiter Home Rhythm öffnet (für alle Nutzer).</div></div>
+          <div class="tile setc"><span class="sico">🗂️</span><div><b>Start-Reiter</b><div class="hint">Mit welchem Reiter HomeRhythm öffnet (für alle Nutzer).</div></div>
             <select data-a="starttab">${[["overview", "Übersicht"], ["heat", "Heizung & Klima"], ["flows", "Abläufe"], ["devices", "Geräte"], ["setup", "Einrichtung"]].map(([k, n]) => `<option value="${k}" ${(d.start_tab || "overview") === k ? "selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="tile setc"><span class="sico">💾</span><div><b>Sicherung</b><div class="hint">Räume, Stufen und Abläufe als Datei. Protokolle, Hand-Änderungen und Benutzernamen sind nicht enthalten.</div>${this._importMsg ? `<div class="hint"><b>${esc(this._importMsg)}</b></div>` : ""}</div>
             <span class="btnrow"><button class="btn" data-a="export">Export</button><label class="btn">Import<input type="file" accept=".json,application/json" data-a="import" hidden></label></span></div>
-          <div class="tile setc"><span class="sico">ℹ️</span><div><b>Home Rhythm ${esc(VERSION)}</b><div class="hint">Läuft komplett lokal in Home Assistant – keine Cloud, keine Daten nach außen.</div></div>
+          <div class="tile setc"><span class="sico">ℹ️</span><div><b>HomeRhythm ${esc(VERSION)}</b><div class="hint">Läuft komplett lokal in Home Assistant – keine Cloud, keine Daten nach außen.</div></div>
             <button class="btn" data-a="nav" data-v="/config/integrations/integration/home_rhythm">Integration</button></div>
         </div>`;
     }
@@ -1795,7 +1819,7 @@
         else if (it.status === "missing") text = `„${esc(it.entities.join(", "))}“ ist eingestellt, gibt es aber nicht (mehr).`;
         else if (it.status === "none") text = esc(it.without);
         else text = key === "outdoor" ? "Kein Sensor gewählt (optional)." : "Nicht eingestellt.";
-        if (this._reqWdWait && key === "workday" && it.status !== "ok") text = "Der Dialog von Home Assistant ist offen. Home Rhythm übernimmt den Sensor, sobald er fertig ist.";
+        if (this._reqWdWait && key === "workday" && it.status !== "ok") text = "Der Dialog von Home Assistant ist offen. HomeRhythm übernimmt den Sensor, sobald er fertig ist.";
         const btn = (a, label, pri, extra = "") => `<button class="btn sm ${pri ? "pri" : ""}" data-a="${a}" data-v="${key}" ${extra}>${label}</button>`;
         let btns = "";
         if (this._admin) {
@@ -1959,7 +1983,7 @@
             <label><input type="checkbox" data-a="devpref" data-k="devColReach" ${colR ? "checked" : ""}> Erreichbarkeit</label>
             <label><input type="checkbox" data-a="devpref" data-k="devColHum" ${colH ? "checked" : ""}> Luftfeuchte</label></div>
         </div>
-        <div class="hint" style="margin:6px 4px 10px">${filtering ? `${shown} von ${all.length} Geräten passen – Etagen und Räume sind dafür aufgeklappt.` : `${all.length} Geräte.`} Schilder: wofür Home Rhythm das Gerät benutzt (🔥 Heizung, ⏱ Abläufe) – antippen öffnet die Stelle, der Name öffnet das Gerät in Home Assistant. Schwach heißt: ${d.battery_low} % oder weniger bzw. Batterie-Warnung des Geräts.</div>
+        <div class="hint" style="margin:6px 4px 10px">${filtering ? `${shown} von ${all.length} Geräten passen – Etagen und Räume sind dafür aufgeklappt.` : `${all.length} Geräte.`} Schilder: wofür HomeRhythm das Gerät benutzt (🔥 Heizung, ⏱ Abläufe) – antippen öffnet die Stelle, der Name öffnet das Gerät in Home Assistant. Schwach heißt: ${d.battery_low} % oder weniger bzw. Batterie-Warnung des Geräts.</div>
         ${groups + flowGroup || `<div class="empty">${filtering ? "✓ Nichts gefunden – mit diesem Filter ist alles in Ordnung." : "Noch keine Räume eingerichtet."}</div>`}`;
     }
 
@@ -2142,7 +2166,7 @@
       const sel = this._selMin();
       const roomRow = (r) => {
         const lr = live[r.id] || {};
-        if (r.paused) return `<div class="ovr2 off" data-a="goroom" data-v="${esc(r.id)}"><span class="ico">⏸</span><span class="nm">${esc(r.name)}</span><span class="num">${fmtTemp((lr.climate || {}).current_temperature)}<small>Ist</small></span><span class="num">–<small>Soll</small></span><span class="why"><span class="txt">pausiert – Home Rhythm steuert nicht</span></span><span class="chev">›</span></div>`;
+        if (r.paused) return `<div class="ovr2 off" data-a="goroom" data-v="${esc(r.id)}"><span class="ico">⏸</span><span class="nm">${esc(r.name)}</span><span class="num">${fmtTemp((lr.climate || {}).current_temperature)}<small>Ist</small></span><span class="num">–<small>Soll</small></span><span class="why"><span class="txt">pausiert – HomeRhythm steuert nicht</span></span><span class="chev">›</span></div>`;
         const off = r.hvac === "off";
         let ico, icoT;
         if (atNow) [ico, icoT] = this._icon(lr);
@@ -2243,7 +2267,7 @@
             <button class="seg ${!q.back && q.off ? "on" : ""}" data-a="qlvl" data-v="off">aus</button></div>
           ${q.back ? `<div class="hint">„Übernehmen“ beendet die Hand-Änderung – der Raum folgt wieder dem Plan.</div>` : `<div class="qlab">GILT BIS</div>
           <div class="qsegs">${untilOpts.map(([k, n]) => `<button class="seg ${q.until === k ? "on" : ""}" data-a="quntil" data-v="${k}">${esc(n)}</button>`).join("")}</div>`}
-          <div class="hint">Plan jetzt: ${esc(plan)}. ${room.temp_source === "sensors" || (room.room_temp && room.room_temp.value != null) ? "Du stellst die Raumtemperatur ein – Home Rhythm rechnet sie für das Thermostat um." : ""}</div>
+          <div class="hint">Plan jetzt: ${esc(plan)}. ${room.temp_source === "sensors" || (room.room_temp && room.room_temp.value != null) ? "Du stellst die Raumtemperatur ein – HomeRhythm rechnet sie für das Thermostat um." : ""}</div>
           ${q.err ? `<div class="err">${esc(q.err)}</div>` : ""}
         </div>
         <div class="qft"><button class="btn" data-a="qback" ${room.manual || q.dirty ? "" : "disabled"}>Zurück zum Plan</button>${this._knopf && !this._config.navigation_path ? "" : `<button class="linkbtn" data-a="qgo">Raum öffnen ›</button>`}<span class="sp"></span>
@@ -2609,6 +2633,7 @@
         if (pane) pane.innerHTML = this._flowPreviewHtml();
         // „heute ≈ …“ hängt an den Sonnenzeiten der Vorschau
         this.shadowRoot.querySelectorAll("[data-calc]").forEach((el) => { el.textContent = this._sunCalc(this._calcSpec(el.dataset.calc)); });
+        this._fillYears();
       }, 250);
     }
 
@@ -2909,9 +2934,10 @@
       let m = (spec.ref === "sunrise" ? sun.rise : sun.set) + (Number(spec.offset) || 0);
       const e = spec.earliest ? normTime(spec.earliest) : null, l = spec.latest ? normTime(spec.latest) : null;
       const toM = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
-      if (e) m = Math.max(m, toM(e));
-      if (l) m = Math.min(m, toM(l));
-      return `heute ≈ ${minHm(Math.max(0, Math.min(1439, Math.round(m))))}`;
+      let w = "";
+      if (e && m < toM(e)) { m = toM(e); w = " · frühestens greift"; }
+      if (l && m > toM(l)) { m = toM(l); w = " · spätestens greift"; }
+      return `heute ≈ ${minHm(Math.max(0, Math.min(1439, Math.round(m))))}${w}`;
     }
 
     _specHtml(path, spec, which, kind, noLabel = false, withNormal = false) {
@@ -2922,14 +2948,15 @@
       if (withNormal) refs.unshift(["normal", "wie sonst"]);
       const sel = (f, opts, val, aria) => `<select class="inp" data-a="fsp" data-p="${path}" data-f="${f}" aria-label="${esc(aria)}">${opts.map(([v, n]) => `<option value="${v}" ${v === val ? "selected" : ""}>${esc(n)}</option>`).join("")}</select>`;
       const ref = spec.ref || "time", unit = spec.unit === "h" ? "h" : "min";
-      let body = sel("ref", refs, ref, `${label} – wann`);
+      let body = sel("ref", refs, ref, `${label} – wann`), after = "";
       if (ref === "time") body += `<input class="inp tm" data-a="fsp" data-p="${path}" data-f="time" value="${esc(spec.time || "")}" maxlength="5" aria-label="${label} Uhrzeit" placeholder="hh:mm">`;
       else if (ref !== "none" && ref !== "normal") {
         const shown = unit === "h" ? String(Math.round(((spec.offset || 0) / 60) * 100) / 100).replace(".", ",") : (spec.offset || 0);
         body += `<input class="inp off" type="text" inputmode="decimal" data-a="fsp" data-p="${path}" data-f="offset" value="${esc(shown)}" aria-label="Versatz" title="+ danach, − davor">
           ${sel("unit", [["min", "min"], ["h", "Std."]], unit, "Einheit")}
-          <span class="unit">${open ? "frühestens" : "spätestens"}</span><input class="inp tm" data-a="fsp" data-p="${path}" data-f="${open ? "earliest" : "latest"}" value="${esc((open ? spec.earliest : spec.latest) || "")}" maxlength="5" placeholder="–" aria-label="${open ? "frühestens" : "spätestens"}">
+          ${this._limChipHtml(path, spec)}
           <span class="calc" data-calc="${path}">${esc(this._sunCalc(spec))}</span>`;
+        after = this._limHtml(path, spec);
       }
       if (open && ref !== "none" && ref !== "normal" && cover) {
         const pos = spec.position !== undefined && spec.position !== null && spec.position !== "";
@@ -2937,7 +2964,136 @@
         if (pos) body += `<input class="inp" type="number" min="0" max="100" data-a="fsp" data-p="${path}" data-f="position" value="${esc(spec.position)}" aria-label="Position in Prozent"><span class="unit">%</span>`;
       }
       if (open && ref !== "none" && ref !== "normal" && !cover && this._editHasLights()) body += `<input class="inp" type="number" min="1" max="100" step="5" data-a="fsp" data-p="${path}" data-f="brightness" value="${esc(spec.brightness ?? "")}" placeholder="Hell. %" title="Helligkeit % – nur für Lampen">`;
-      return `<div class="srl">${noLabel ? "" : `<span class="lb">${open ? "▲" : "▼"}&nbsp;${label}</span>`}${body}</div>`;
+      return `<div class="srl">${noLabel ? "" : `<span class="lb">${open ? "▲" : "▼"}&nbsp;${label}</span>`}${body}</div>${after}`;
+    }
+
+    // ---- 0.9.15: Grenzen „frühestens / spätestens“ an Sonnenzeiten (Entwurf „Grenzen“, Variante B) ----
+    // Knopf „+ Grenzen“; sind Grenzen gesetzt, zeigt er sie („18:00 – 23:00 ✎“). Antippen klappt die zwei Felder auf.
+    _limChipHtml(path, spec) {
+      const e = spec.earliest || "", l = spec.latest || "", set = !!(e || l);
+      const open = !!((this._fedit && this._fedit.limOpen) || {})[path];
+      const txt = e && l ? `${e} – ${l}` : e ? `frühestens ${e}` : l ? `spätestens ${l}` : "+ Grenzen";
+      return `<button class="limchip${set ? " set" : ""}" data-a="flim" data-v="${esc(path)}" aria-expanded="${open}" title="nicht vor / nicht nach einer Uhrzeit">${esc(txt)}${set ? " ✎" : ""}</button>`;
+    }
+
+    // Aufgeklappte Felder, Fehler „frühestens nach spätestens“ und das Jahresband (wird nach der Vorschau gefüllt).
+    _limHtml(path, spec) {
+      const e = spec.earliest || "", l = spec.latest || "";
+      const open = !!((this._fedit && this._fedit.limOpen) || {})[path];
+      const fld = (f, n) => `<span class="unit">${n}</span><input class="inp tm" data-a="fsp" data-p="${esc(path)}" data-f="${f}" value="${esc(spec[f] || "")}" maxlength="5" placeholder="–" aria-label="${n}">`;
+      let h = open ? `<div class="srl slim"><span class="lb lb2">nicht vor / nach</span>${fld("earliest", "frühestens")}${fld("latest", "spätestens")}<button class="linkbtn" data-a="flim" data-v="${esc(path)}">fertig</button></div>` : "";
+      if (e && l && e > l) h += `<div class="limerr">„frühestens“ liegt nach „spätestens“</div>`;  // HH:MM – Textvergleich reicht
+      else if (e || l) h += `<div class="syear" data-year="${esc(path)}">${this._yearHtml(path)}</div>`;
+      return h;
+    }
+
+    // Jahresband: an welchen Tagen greift welche Grenze? Sonnenzeiten fürs ganze Jahr kommen mit der Vorschau (sun_year).
+    _yearHtml(path) {
+      const spec = this._calcSpec(path), sy = this._fedit && this._fedit.preview && this._fedit.preview.sun_year;
+      if (!spec || !["sunrise", "sunset"].includes(spec.ref)) return "";
+      if (!sy) return `<span class="ytxt">Jahresverlauf wird berechnet …</span>`;
+      const toM = (t) => (t ? Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)) : null);
+      const e = toM(spec.earliest), l = toM(spec.latest), off = Number(spec.offset) || 0;
+      const raw = (spec.ref === "sunrise" ? sy.rise : sy.set).map((b) => b + off), n = raw.length;
+      const hit = raw.map((m) => (e != null && m < e ? "e" : l != null && m > l ? "l" : ""));
+      const eff = raw.map((m, i) => (hit[i] === "e" ? e : hit[i] === "l" ? l : m));
+      // zusammenhängende Abschnitte, über den Jahreswechsel hinweg verbunden
+      const ranges = (k) => {
+        const on = hit.map((x) => x === k);
+        if (!on.some(Boolean)) return [];
+        if (on.every(Boolean)) return [[0, n - 1]];
+        const out = [], start = on.findIndex((x) => !x);
+        let cur = null;
+        for (let j = 1; j <= n; j++) {
+          const i = (start + j) % n;
+          if (on[i] && cur === null) cur = i;
+          if (!on[i] && cur !== null) { out.push([cur, (i - 1 + n) % n]); cur = null; }
+        }
+        return out;
+      };
+      const dTxt = (i) => { const d = new Date(sy.year, 0, 1 + i); return `${d.getDate()}.${d.getMonth() + 1}.`; };
+      // Für den Text glätten: Lücken bis 3 Tage schließen (z. B. am Tag der Zeitumstellung), Abschnitte bis 3 Tage weglassen.
+      // Die Tageszahl in Klammern bleibt genau.
+      const smooth = (r) => {
+        if (r.length < 2) return r;
+        const out = [r[0].slice()];
+        for (const [a, b] of r.slice(1)) {
+          const last = out[out.length - 1];
+          if (((a - last[1] + n) % n) - 1 <= 3) last[1] = b; else out.push([a, b]);
+        }
+        if (out.length > 1) { const f = out[0], l = out[out.length - 1]; if (((f[0] - l[1] + n) % n) - 1 <= 3) { l[1] = f[1]; out.shift(); } }
+        const long = out.filter(([a, b]) => ((b - a + n) % n) + 1 > 3);
+        return long.length ? long : out;
+      };
+      const rTxt = (r) => smooth(r).map(([a, b]) => (a === 0 && b === n - 1 ? "das ganze Jahr" : `ca. ${dTxt(a)}–${dTxt(b)}`)).join(", ");
+      const days = (r) => r.reduce((s, [a, b]) => s + ((b - a + n) % n) + 1, 0);
+      const COL = { e: "#2f7fd8", l: "#8a4fd0" };
+      // Band als Farbverlauf mit harten Kanten – ein Element statt 365
+      const stops = [];
+      let i0 = 0;
+      for (let i = 1; i <= n; i++) {
+        if (i === n || hit[i] !== hit[i0]) {
+          const c = COL[hit[i0]] || "transparent", a = ((i0 / n) * 100).toFixed(2), b = ((i / n) * 100).toFixed(2);
+          stops.push(`${c} ${a}%`, `${c} ${b}%`);
+          i0 = i;
+        }
+      }
+      const parts = [];
+      for (const [k, lim, word, cls] of [["e", spec.earliest, "frühestens", "ye"], ["l", spec.latest, "spätestens", "yl"]]) {
+        if (!lim) continue;
+        const r = ranges(k);
+        parts.push(`<span class="${cls}">${word} ${esc(lim)}</span> ${r.length ? `greift ${rTxt(r)} (${days(r)} Tage)` : "greift nie – schadet nicht"}`);
+      }
+      const open = !!((this._fedit && this._fedit.yearOpen) || {})[path];
+      const MON = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+      let svg = "";
+      if (open) {
+        // in echter Breite zeichnen (_fillYears misst nach dem Aufbau nach), damit die Schrift nicht schrumpft
+        const W = Math.max(260, Math.round(this._yearW || 520)), H = 170, pl = 40, pr = 6, pt = 8, pb = 20;
+        const all = raw.concat(eff, [e, l].filter((x) => x != null));
+        const lo = Math.floor((Math.min(...all) - 20) / 60) * 60, hi = Math.ceil((Math.max(...all) + 20) / 60) * 60;
+        const x = (i) => pl + ((W - pl - pr) * i) / (n - 1), y = (m) => pt + (H - pt - pb) * (1 - (m - lo) / (hi - lo));
+        const step = (hi - lo) / 60 > 8 ? 120 : 60, today = new Date(this._data.now);
+        let g = "";
+        for (let m = lo; m <= hi; m += step) g += `<line x1="${pl}" x2="${W - pr}" y1="${y(m)}" y2="${y(m)}" stroke="var(--divider-color)"/><text x="${pl - 5}" y="${y(m) + 4}" font-size="11" text-anchor="end" fill="var(--secondary-text-color)">${minHm(((m % 1440) + 1440) % 1440)}</text>`;
+        [0, 2, 4, 6, 8, 10].forEach((mo) => { const d = Math.round((new Date(sy.year, mo, 1) - new Date(sy.year, 0, 1)) / 864e5); g += `<text x="${x(d) + 2}" y="${H - 5}" font-size="11" fill="var(--secondary-text-color)">${MON[mo]}</text>`; });
+        for (const [k, v] of [["e", e], ["l", l]]) if (v != null) g += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="${COL[k]}" stroke-dasharray="4 3"/>`;
+        const line = (arr) => arr.map((m, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(m).toFixed(1)}`).join("");
+        g += `<path d="${line(raw)}" fill="none" stroke="var(--secondary-text-color)" stroke-width="1" stroke-dasharray="2 3"/>`;
+        g += `<path d="${line(eff)}" fill="none" stroke="var(--primary-color)" stroke-width="2.2"/>`;
+        if (today.getFullYear() === sy.year) { const d = Math.round((today - new Date(sy.year, 0, 1)) / 864e5); g += `<line x1="${x(d)}" x2="${x(d)}" y1="${pt}" y2="${H - pb}" stroke="#e53935"/>`; }
+        svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Jahresverlauf der Schaltzeit: gestrichelt nach der Sonne, durchgezogen mit Grenzen">${g}</svg>`;
+      }
+      return `<div class="yband" style="background:linear-gradient(to right, ${stops.join(", ")}), var(--divider-color)" aria-hidden="true"></div>
+        <div class="ymon">${MON.map((m) => `<span>${m}</span>`).join("")}</div>
+        <div class="ytxt">${parts.join(" · ")} <button class="linkbtn" data-a="fyear" data-v="${esc(path)}" aria-expanded="${open}">${open ? "Jahresverlauf ⌃" : "Jahresverlauf ⌄"}</button></div>${svg}`;
+    }
+
+    // Jahresbänder neu füllen (nach Aufbau des Editors und nach jeder Vorschau); misst dabei die echte Breite.
+    _fillYears() {
+      const els = this.shadowRoot.querySelectorAll("[data-year]");
+      if (!els.length) return;
+      const w = els[0].clientWidth - 10;
+      if (w > 0) this._yearW = w;
+      els.forEach((el) => { el.innerHTML = this._yearHtml(el.dataset.year); });
+    }
+
+    // Absicherung: gilt sie? Gleiche Regel wie close_after_guard() in flows.py – nicht an Tagen, die später schließen können.
+    _guardNoteHtml(s, cover, rowNames) {
+      const word = cover ? "schließen" : "ausschalten";
+      if (!s.guard) return `<small class="hint">(nur Geräte, die noch nicht so stehen; nicht an Tagen, die später ${word})</small>`;
+      const toM = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)), g = toM(s.guard);
+      const why = (cl) => {
+        if (!cl || ["none", "normal"].includes(cl.ref)) return "";
+        if (cl.ref === "time") return toM(cl.time) < 720 ? `${cl.time} liegt nach Mitternacht` : toM(cl.time) > g ? `${cl.time} liegt danach` : "";
+        if (!cl.latest) return "ohne „spätestens“ kann die Sonnenzeit später sein";
+        return toM(cl.latest) > g ? `„spätestens ${cl.latest}“ liegt danach` : "";
+      };
+      let bad = [];
+      if (!s.close_per_row) { const w = why(s.close); if (w) bad = [w]; }
+      else bad = ["mf", "sa", "so", "hol", "vacwd", "vacwe"].filter((k) => s.rows[k].like === "own" && why(s.rows[k].close)).map((k) => `${rowNames[k] || k}: ${why(s.rows[k].close)}`);
+      return bad.length ? `<small class="hint no">gilt nicht${s.close_per_row ? " für" : ""} – ${esc(bad.join("; "))}</small>`
+        : `<small class="hint">gilt an allen Tagen (nur Geräte, die noch nicht so stehen)</small>`;
     }
 
     _simpleHtml(f) {
@@ -2959,7 +3115,7 @@
         <div class="hint" style="margin:4px 0 8px">Vorrang wie bei der Heizung: bestimmter Tag vor Feiertag vor Urlaub zu Hause vor Wochentag. Eine Uhrzeit zum ${closeWord} vor 12:00 (z. B. 00:30) gilt als „nach Mitternacht“ und gehört zum Vorabend.</div>
         <div class="srl guardl"><label class="chk"><input type="checkbox" data-a="fsc" data-f="guard_on" ${s.guard ? "checked" : ""}> Absicherung: um</label>
           <input class="inp tm" data-a="fsg" value="${esc(s.guard || "23:00")}" maxlength="5" ${s.guard ? "" : "disabled"} aria-label="Absicherung Uhrzeit"><span>nochmal ${cover ? "schließen" : "ausschalten"}</span>
-          <small class="hint">(nur Geräte, die noch nicht so stehen; nicht an Tagen, die später ${cover ? "schließen" : "ausschalten"})</small></div>
+          ${this._guardNoteHtml(s, cover, rowNames)}</div>
         <div class="spo"><label><input type="checkbox" data-a="fsc" data-f="only_needed" ${s.only_needed ? "checked" : ""}> nur falls nötig <small class="hint">(nur Geräte, die noch nicht so stehen)</small></label>
           <label><input type="checkbox" data-a="fsc" data-f="verify" ${s.verify ? "checked" : ""}> nachprüfen &amp; wiederholen <small class="hint">(nach 5 min, bis zu 2×)</small></label></div>
         ${cover ? `<div class="reacthint">⚡ <b>Hitzeschutz nach Temperatur?</b> Das ist eine <b>Reaktion</b>, kein Zeitplan: „Wenn Außentemperatur über 25 °C → auf Position“. Zeitgesteuerter Hitzeschutz (z. B. 08:31 auf 1 %) geht als eigener Zeitplan mit „Zeitplan gilt: nur in Jahreszeit Heißphase“ und Öffnen „auf Position“.</div>` : ""}`;
@@ -3047,7 +3203,8 @@
       if (ref === "none") return open ? (cover ? "nicht öffnen" : "nicht einschalten") : (cover ? "nicht schließen" : "nicht ausschalten");
       if (ref === "time") return spec.time || "–";
       const off = Number(spec.offset || 0), unit = spec.unit === "h" ? "Std." : "min", n = spec.unit === "h" ? off / 60 : off;
-      return `${ref === "sunrise" ? "Sonnenaufgang" : "Sonnenuntergang"}${off ? ` ${off > 0 ? "+" : "−"}${Math.abs(n).toString().replace(".", ",")} ${unit}` : ""}`;
+      const lim = spec.earliest && spec.latest ? ` (${spec.earliest}–${spec.latest})` : spec.earliest ? ` (frühestens ${spec.earliest})` : spec.latest ? ` (spätestens ${spec.latest})` : "";
+      return `${ref === "sunrise" ? "Sonnenaufgang" : "Sonnenuntergang"}${off ? ` ${off > 0 ? "+" : "−"}${Math.abs(n).toString().replace(".", ",")} ${unit}` : ""}${lim}`;
     }
 
     _foldSummaries(f) {
@@ -3219,7 +3376,7 @@
       // das würde sonst mitten im Neuaufbau erneut zeichnen.
       if (this._fRendering) return;
       this._fRendering = true;
-      try { this._renderFlowEditorInner(); } finally { this._fRendering = false; }
+      try { this._renderFlowEditorInner(); this._fillYears(); } finally { this._fRendering = false; }
     }
 
     _renderFlowEditorInner() {
@@ -3236,8 +3393,8 @@
             ${[["area", "Bereich"], ["floor", "Etage"], ["label", "Label"]].map(([by, n]) => (sel[by] || []).length ? `<optgroup label="${n}">${sel[by].map((x) => `<option value="${by}|${esc(x.id)}">${esc(x.name)}</option>`).join("")}</optgroup>` : "").join("")}</select></div>` : "";
       const fsum = plan ? this._foldSummaries(f) : {};
       const nativeBox = `<div class="acbox native"><label class="nat"><input type="checkbox" data-a="ffield" data-f="native" ${f.native ? "checked" : ""}> <b>Auch als Automation in Home Assistant anlegen</b></label>
-            <div class="hint">${f.native ? "Home Assistant führt den Ablauf aus (automations.yaml, ID home_rhythm_…) – er läuft auch, wenn Home Rhythm aus ist, und erscheint in den HA-Ablaufverfolgungen. Bitte nur hier bearbeiten. Vor dem ersten Schreiben legt Home Rhythm eine Sicherung der Datei an."
-              : "Aus (Standard): Home Rhythm führt den Ablauf selbst aus – mit Protokoll, Überspringen, Nachprüfen und Vorschau."}</div></div>`;
+            <div class="hint">${f.native ? "Home Assistant führt den Ablauf aus (automations.yaml, ID home_rhythm_…) – er läuft auch, wenn HomeRhythm aus ist, und erscheint in den HA-Ablaufverfolgungen. Bitte nur hier bearbeiten. Vor dem ersten Schreiben legt HomeRhythm eine Sicherung der Datei an."
+              : "Aus (Standard): HomeRhythm führt den Ablauf selbst aus – mit Protokoll, Überspringen, Nachprüfen und Vorschau."}</div></div>`;
       host.innerHTML = `<div class="ov" data-a="fovclick"><div class="dlg" role="dialog" aria-modal="true">
         <header><h2>${this._fedit.isNew ? (plan ? "Neuer Zeitplan" : "Neue Reaktion") : esc(f.name)}</h2><button class="x" data-a="fclose" aria-label="Schließen">✕</button></header>
         ${this._datalists()}
@@ -3347,6 +3504,10 @@
         case "ftype": { const p = f.points[Number(t.dataset.i)]; p.types = (p.types || []).includes(v) ? p.types.filter((x) => x !== v) : [...(p.types || []), v]; rerender(); return true; }
         case "fsim": this._fedit.sim = v; this._renderFlowEditor(); this._flowPreview(); return true;
         case "ffold": this._foldToggle(t.dataset.k); this._renderFlowEditor(); return true;
+        case "flim": { const o = (this._fedit.limOpen = this._fedit.limOpen || {}); o[v] = !o[v]; this._renderFlowEditor();
+          if (o[v]) { const inp = this.shadowRoot.querySelector(`input[data-a="fsp"][data-f="earliest"][data-p="${v}"]`); if (inp) inp.focus(); }
+          return true; }
+        case "fyear": { const o = (this._fedit.yearOpen = this._fedit.yearOpen || {}); o[v] = !o[v]; this._renderFlowEditor(); return true; }
         case "ffoldall": for (const k of ["dev", "times", "special", "gilt", "button"]) this._foldToggle(k, v === "open"); this._renderFlowEditor(); return true;
         case "fweek": {
           const ed = this._fedit, base = ed.week || (ed.preview && ed.preview.dates ? ed.preview.dates[0] : null);
@@ -3697,14 +3858,14 @@
               <div>${!chosen.size ? "Bitte mindestens einen Sensor wählen." : vals.length > 1 ? `Durchschnitt aus ${vals.length}: <b>${fmtNum(avg, 1)} °C</b>` : avg != null ? `Gemessen: <b>${fmtNum(avg, 1)} °C</b>` : ""}</div>
               <div class="hint">Sensoren, die nicht verfügbar sind oder seit 12 Std. nichts melden, zählen nicht mit. Liegen die Werte mehr als 2 °C auseinander, gibt es einen Hinweis.</div></div>` : "")
           + (room.kind === "fritz" ? radio("box", "In der Fritz!Box eingestellt", "– z. B. FRITZ!DECT 440 als Raumsensor")
-            + (room.temp_source === "box" ? `<div class="rtgroup"><label>Anzeigen in Home Rhythm von<select class="inp" data-a="rtbox"><option value="">– bitte wählen –</option>
+            + (room.temp_source === "box" ? `<div class="rtgroup"><label>Anzeigen in HomeRhythm von<select class="inp" data-a="rtbox"><option value="">– bitte wählen –</option>
                 ${boxOpts.map((x) => `<option value="${esc(x.entity_id)}" ${x.entity_id === room.box_sensor ? "selected" : ""}>${esc(x.name)} · ${val(x)}</option>`).join("")}</select></label>
-                <div class="hint">Das Thermostat regelt in der Fritz!Box nach diesem Sensor – Home Rhythm schickt den Sollwert unverändert und zeigt den Wert als Ist. Einstellen: Fritz!Box → Smart Home → Thermostat → Temperatur (ab FRITZ!OS 7.20).</div></div>` : "") : "");
+                <div class="hint">Das Thermostat regelt in der Fritz!Box nach diesem Sensor – HomeRhythm schickt den Sollwert unverändert und zeigt den Wert als Ist. Einstellen: Fritz!Box → Smart Home → Thermostat → Temperatur (ab FRITZ!OS 7.20).</div></div>` : "") : "");
       }
       let step3;
       if (integ) step3 = `<div class="hint">Macht ${intName} selbst – hier nichts einzustellen.</div>`;
       else if (room.temp_source === "box") step3 = `<div class="hint">Macht die Fritz!Box – hier nichts einzustellen. Misst der Sensor zu viel oder zu wenig, dort einen Temperatur-Versatz einstellen.</div>`;
-      else if (room.kind === "direct" && room.temp_source === "sensors") step3 = `<div class="hint">Home Rhythm schickt den Raumwert ans Thermostat (bei jeder Änderung, spätestens alle 10 min) und stellt es auf externe Temperatur. Das Thermostat regelt dann selbst nach dem Raum – keine Korrektur nötig.</div>`;
+      else if (room.kind === "direct" && room.temp_source === "sensors") step3 = `<div class="hint">HomeRhythm schickt den Raumwert ans Thermostat (bei jeder Änderung, spätestens alle 10 min) und stellt es auf externe Temperatur. Das Thermostat regelt dann selbst nach dem Raum – keine Korrektur nötig.</div>`;
       else {
         const opts = [["none", "keine"], ["fixed", "fest"], ...(room.kind === "fritz" && room.temp_source === "sensors" ? [["observe", "beobachten"]] : [])];
         const cur = opts.some(([k]) => k === room.correction) ? room.correction : "none";
@@ -3712,7 +3873,7 @@
           ${cur === "fixed" ? `<label class="rtval">± <input class="inp" type="number" step="0.5" min="-5" max="5" data-a="rtcval" value="${esc(room.correction_value || 0)}" aria-label="Korrektur in Grad"> °C</label>` : ""}</div>
           <div class="hint">${{ none: "Das Thermostat regelt nach seinem Fühler, wie er misst.",
             fixed: "Fester Wert wie der Versatz in der Fritz!Box: misst der Fühler 1,5 °C zu viel, −1,5 eintragen. Das Display am Thermostat zeigt dann den umgerechneten Wert (z. B. 22,5 statt 21).",
-            observe: "Ändert nichts an der Regelung. Home Rhythm misst, um wie viel der Fühler bei geschlossenem Ventil vom Raumwert abweicht – zum Exportieren und später für „lernen“." }[cur]}</div>`;
+            observe: "Ändert nichts an der Regelung. HomeRhythm misst, um wie viel der Fühler bei geschlossenem Ventil vom Raumwert abweicht – zum Exportieren und später für „lernen“." }[cur]}</div>`;
       }
       return `<h3 class="step"><b>2</b> · Welche Sensoren messen die Raumtemperatur?</h3><div class="rtsec">${step2}</div>
         <h3 class="step"><b>3</b> · Korrektur der Temperatur</h3><div class="rtsec">${step3}</div>`;
@@ -3761,6 +3922,7 @@
               <label>Bereich<select class="inp" data-a="field" data-f="area_id">${areaOpts}</select></label>
             </div>
             <h3 class="step"><b>1</b> · Welche Art von Thermostat?</h3>
+            ${(() => { const saved = (this._data.rooms || []).find((x) => x.id === room.id); return saved && saved.kind_hint && saved.kind_hint.kind === room.kind ? this._kindHintHtml(saved, true) : ""; })()}
             <div class="pills">${RT_KINDS.map(([k, n]) => `<button class="seg big ${room.kind === k ? "on" : ""}" data-a="rtkind" data-v="${k}">${n}</button>`).join("")}</div>
             <div class="hint">${RT_KIND_HINT[room.kind] || ""}</div>
             <div class="ths">${thermoHtml}</div>
@@ -3775,7 +3937,7 @@
             <h3 class="step"><b>5</b> · Weiteres</h3>
             <div class="grid2"><label>Hand-Änderung gilt<select class="inp" data-a="field" data-f="manual_mode">
                 ${MANUAL_MODES.map(([v, n]) => `<option value="${v}" ${v === String(room.manual_mode) ? "selected" : ""}>${n}</option>`).join("")}</select></label></div>
-            <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" data-a="field" data-f="enabled" ${room.enabled ? "checked" : ""}> Home Rhythm steuert diesen Raum</label>
+            <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" data-a="field" data-f="enabled" ${room.enabled ? "checked" : ""}> HomeRhythm steuert diesen Raum</label>
             <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="checkbox" data-a="field" data-f="party_room" ${room.party_room ? "checked" : ""}> Party-Raum (bei Ereignis „Party“ Komfort bis 1 Uhr)</label>
             <div class="grid2" style="margin-top:8px"><label>Luftfeuchte anzeigen von<select class="inp" data-a="field" data-f="humidity_entity">
               <option value="" ${!room.humidity_entity ? "selected" : ""}>automatisch${(() => { const o = room.id && this._room(room.id); const h = o && o.humidity && o.humidity.auto ? o.humidity : null; return h ? ` – jetzt: ${esc(h.name)} (${esc(h.source || "")})` : " (BT/VT, Thermostat, dann Raumsensor)"; })()}</option>
@@ -3862,7 +4024,7 @@
         <button class="btn" data-a="addcop">+ COP-Wert</button>
         <div class="verdict">${verdict}</div>
         ${this._coolHtml(room)}
-        <div class="hint">Wärme aus Gas: ${fmtNum(e.gas_ct, 2)} ct ÷ ${fmtNum(e.boiler_efficiency * 100, 0)} % = ${fmtNum(e.heat_cost_gas)} ct/kWh · Strom ${fmtNum(e.power_ct, 2)} ct/kWh → Klima lohnt ab COP ${fmtNum(e.break_even_cop, 2)}. Preise und Außensensoren: Einstellungen → Home Rhythm → Konfigurieren → Energie.</div>
+        <div class="hint">Wärme aus Gas: ${fmtNum(e.gas_ct, 2)} ct ÷ ${fmtNum(e.boiler_efficiency * 100, 0)} % = ${fmtNum(e.heat_cost_gas)} ct/kWh · Strom ${fmtNum(e.power_ct, 2)} ct/kWh → Klima lohnt ab COP ${fmtNum(e.break_even_cop, 2)}. Preise und Außensensoren: Einstellungen → HomeRhythm → Konfigurieren → Energie.</div>
       </div>`;
     }
 
@@ -3965,6 +4127,11 @@
       else if (a === "addrule") { (this._editor.room.rules = this._editor.room.rules || []).push({ if: { mode: "event", op: "is", value: "Gäste" }, then: "komfort" }); this._renderEditor(); this._editorPreview(); }
       else if (a === "delrule") { this._editor.room.rules.splice(Number(t.dataset.i), 1); this._renderEditor(); this._editorPreview(); }
       else if (a === "dismiss") { await this._ws({ type: "home_rhythm/hint/dismiss", hint_id: v }); this._fetch(); }
+      else if (a === "kindset") {
+        try { await this._ws({ type: "home_rhythm/room/kind", room_id: v, kind: t.dataset.k }); }
+        catch (err) { alert(`Umstellen ging nicht: ${(err && err.message) || err}`); }
+        this._fetch();
+      }
       else if (a === "resethints") { await this._ws({ type: "home_rhythm/hint/reset", room_id: v }); this._fetch(); }
       else if (a === "nav") { history.pushState(null, "", v); window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } })); }
       else if (a === "ctl") this._qOpenRoom(v);  // 0.9.12: eigenes Fenster (Gerät ⤴ darin öffnet das HA-Fenster)
@@ -3996,7 +4163,7 @@
       else if (a === "rtmore") { this._editor.rtMore = !this._editor.rtMore; this._renderEditor(); }
       else if (a === "save") this._saveEditor();
       else if (a === "delete") {
-        if (!confirm(`Raum „${this._editor.room.name}“ aus Home Rhythm entfernen? Das Thermostat bleibt auf dem letzten Wert.`)) return;
+        if (!confirm(`Raum „${this._editor.room.name}“ aus HomeRhythm entfernen? Das Thermostat bleibt auf dem letzten Wert.`)) return;
         await this._ws({ type: "home_rhythm/room/delete", room_id: this._editor.room.id });
         this._open.delete(this._editor.room.id);
         this._closeEditor();
@@ -4184,7 +4351,7 @@
           <small>Mit Raum: kleine Karte für ein Dashboard. Bedienen dürfen alle Benutzer, Einstellungen nur Administratoren.</small></div>` : `<div class="f"><label class="t">Bereich</label>
           <select data-k="area"><option value="">– ganze Home-Rhythm-Ansicht –</option>${areas.map((a) => `<option value="${esc(a.id)}" ${c.area === a.id ? "selected" : ""}>${esc(a.name)}${roomAreas.has(a.id) ? "" : " (kein Home-Rhythm-Raum)"}</option>`).join("")}</select>
           <small>${c.area ? (areaRoom ? `Zeigt den Home-Rhythm-Raum „${esc(areaRoom.name)}“.` : "Zu diesem Bereich gibt es keinen Home-Rhythm-Raum – die Karte zeigt nur eine kleine Zeile.") : "Die Karte sucht den Home-Rhythm-Raum mit diesem Bereich (bei mehreren den ersten)."}</small></div>`}
-        <div class="f"><label class="t">${c.layout === "knopf" ? "Name" : "Titel"} <small>(optional)</small></label><input type="text" data-k="${c.layout === "knopf" ? "name" : "title"}" value="${esc((c.layout === "knopf" ? c.name || c.title : c.title) || "")}" placeholder="${one ? "Name des Raums" : "Home Rhythm"}"></div>
+        <div class="f"><label class="t">${c.layout === "knopf" ? "Name" : "Titel"} <small>(optional)</small></label><input type="text" data-k="${c.layout === "knopf" ? "name" : "title"}" value="${esc((c.layout === "knopf" ? c.name || c.title : c.title) || "")}" placeholder="${one ? "Name des Raums" : "HomeRhythm"}"></div>
         ${one ? `
         <div class="f"><label class="t">Größe</label><div class="segs">${seg("layout", "knopf", "Knopf (Kachel)", layout)}${seg("layout", "compact", "Kompakt (eine Zeile)", layout)}${seg("layout", "standard", "Standard", layout)}${seg("layout", "tablet", "Groß (Tablet)", layout)}</div></div>
         ${layout === "knopf" ? `
@@ -4223,7 +4390,7 @@
     customElements.define("home-rhythm-card", HomeRhythmCard);
     if (!customElements.get("home-rhythm-card-editor")) customElements.define("home-rhythm-card-editor", HomeRhythmCardEditor);
     window.customCards = window.customCards || [];
-    window.customCards.push({ type: "home-rhythm-card", name: "Home Rhythm", description: "Hausmodi, Wochenpläne und Begründung je Raum – oder ein einzelner Raum zum Bedienen", preview: false });
+    window.customCards.push({ type: "home-rhythm-card", name: "HomeRhythm", description: "Hausmodi, Wochenpläne und Begründung je Raum – oder ein einzelner Raum zum Bedienen", preview: false });
     console.info(`%c HOME-RHYTHM %c ${VERSION} `, "background:#e8833a;color:#fff", "");
   }
 })();

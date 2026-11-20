@@ -1,14 +1,14 @@
-"""Voraussetzungen: Was braucht Home Rhythm von Home Assistant, was fehlt, was passt?
+"""Voraussetzungen: Was braucht HomeRhythm von Home Assistant, was fehlt, was passt?
 
 Die Kachel „Voraussetzungen“ in der Karte zeigt für Jahreszeit, Urlaub, Workday, Anwesenheit
 und Außentemperatur, ob etwas eingestellt und vorhanden ist. Fehlt etwas, kann ein Admin
 
 * einen vorhandenen Helfer übernehmen (Vorschlag oder Suche),
 * einen neuen Helfer anlegen (das macht die Karte über die normale HA-Schnittstelle
-  ``input_select/create`` – Home Rhythm trägt ihn danach hier ein),
+  ``input_select/create`` – HomeRhythm trägt ihn danach hier ein),
 * oder bewusst „ohne“ wählen – dann gibt es keinen Hinweis mehr.
 
-Geändert werden nur die Einstellungen von Home Rhythm (Optionen des Config-Eintrags).
+Geändert werden nur die Einstellungen von HomeRhythm (Optionen des Config-Eintrags).
 Alle Eingaben werden geprüft: nur vorhandene Entitäten der passenden Domain.
 """
 

@@ -1,10 +1,10 @@
-<p align="center"><img src="custom_components/home_rhythm/brand/logo.png" alt="Home Rhythm" width="420"></p>
+<p align="center"><img src="custom_components/home_rhythm/brand/logo.png" alt="HomeRhythm" width="420"></p>
 
-# Home Rhythm
+# HomeRhythm
 
 **Der Wochenrhythmus deines Zuhauses – Heizung, Klima, Rollläden, Licht und Steckdosen in einer Karte, mit Begründung.**
 
-Home Rhythm ist eine Integration für [Home Assistant](https://www.home-assistant.io/) mit eigener Dashboard-Karte.
+HomeRhythm ist eine Integration für [Home Assistant](https://www.home-assistant.io/) mit eigener Dashboard-Karte.
 Sie steuert alle Thermostate und Klimaanlagen nach Wochenplänen und Hausmodi (Jahreszeit, Urlaub, Feiertag,
 Anwesenheit …), schaltet Rollläden, Licht und Steckdosen nach frei zusammengestellten Zeitplänen und reagiert auf
 Ereignisse wie Bewegung oder einen Knopfdruck. Für jeden Raum und jeden Ablauf siehst du, **was gerade gilt und warum**.
@@ -13,15 +13,15 @@ Ereignisse wie Bewegung oder einen Knopfdruck. Für jeden Raum und jeden Ablauf 
 
 ---
 
-## Was Home Rhythm besonders macht
+## Was HomeRhythm besonders macht
 
-Die meisten Heizungs- und Zeitplan-Lösungen beantworten nur „was soll passieren?“. Home Rhythm beantwortet auch
+Die meisten Heizungs- und Zeitplan-Lösungen beantworten nur „was soll passieren?“. HomeRhythm beantwortet auch
 **„warum passiert gerade das – und was passiert als Nächstes?“**: Jede Raumzeile sagt dir „Komfort 21 °C · Wochenplan
 · bis 22:00“, „Hand-Änderung (Automation ‚Gute Nacht‘) · bis morgen“ oder „Feiertag → Sonntagsplan“, und die
 Übersicht zeigt als Zeitleiste alles, was heute im Haus noch geschaltet wird – auch für ein beliebiges Datum, etwa
 Heiligabend. Statt vieler einzelner Automationen gibt es **einen Ort** für Hausmodi, Wochenpläne, Rollläden, Licht und
 Reaktionen, mit **verständlichen Sätzen statt YAML** („Wenn Bewegung am Hoftor und Sonne ist dunkel → Licht an,
-nach 3 Minuten ohne Bewegung aus“). Home Rhythm respektiert, was Menschen von Hand ändern (es schaltet nur zu
+nach 3 Minuten ohne Bewegung aus“). HomeRhythm respektiert, was Menschen von Hand ändern (es schaltet nur zu
 Schaltpunkten und erkennt Hand-Änderungen am Thermostat), es erkennt **fremde Steuerung** (Automationen, Fritz!Box-
 Zeitpläne), die gegen den Plan arbeiten, und es rechnet bei Klimaanlagen aus, **ob gerade Gas oder Strom billiger heizt**.
 Und wer lieber bei klassischen HA-Automationen bleibt, kann jeden Ablauf mit einem Schalter **auch als echte
@@ -66,7 +66,7 @@ Home-Assistant-Automation** anlegen lassen.
 ### Über HACS (empfohlen)
 
 1. HACS → ⋮ → **Benutzerdefinierte Repositories** → URL dieses Repositorys, Typ **Integration** → Hinzufügen.
-2. „Home Rhythm“ suchen → **Herunterladen**.
+2. „HomeRhythm“ suchen → **Herunterladen**.
 3. Home Assistant neu starten.
 
 Updates erscheinen danach automatisch in HACS.
@@ -79,12 +79,12 @@ Updates erscheinen danach automatisch in HACS.
 
 ### Einrichten
 
-1. **Einstellungen → Geräte & Dienste → Integration hinzufügen → Home Rhythm.**
+1. **Einstellungen → Geräte & Dienste → Integration hinzufügen → HomeRhythm.**
 2. Schritt 1 **Hausmodi**: Helfer für Jahreszeit, Urlaub, Arbeitstag, Anwesenheit; Urlaubstemperatur; welche
    Jahreszeiten gekühlt werden.
 3. Schritt 2 **Energie**: Außentemperatur-Sensoren (einer oder mehrere, Mittel oder kältester), Gas- und Strompreis
    (fest oder aus einer Entität), Wirkungsgrad der Therme, Grenzen für die automatische Jahreszeit.
-4. Ein Dashboard öffnen → Bearbeiten → **Karte hinzufügen → „Home Rhythm“** oder als YAML:
+4. Ein Dashboard öffnen → Bearbeiten → **Karte hinzufügen → „HomeRhythm“** oder als YAML:
 
    ```yaml
    type: custom:home-rhythm-card
@@ -93,7 +93,7 @@ Updates erscheinen danach automatisch in HACS.
    Am besten in einer eigenen Ansicht vom Typ **Panel (eine Karte)**. Eine Ressource muss nicht angelegt werden.
 5. Browser einmal neu laden (in der App: Einstellungen → Companion App → Debugging → Frontend-Cache leeren).
 
-Später änderst du alles unter **Einstellungen → Geräte & Dienste → Home Rhythm → Konfigurieren** oder über ⚙️ in der Karte.
+Später änderst du alles unter **Einstellungen → Geräte & Dienste → HomeRhythm → Konfigurieren** oder über ⚙️ in der Karte.
 
 ---
 
@@ -124,12 +124,12 @@ Bereichs sind vorausgewählt. Ein Thermostat gehört immer nur zu einem Raum.
 
 ### Klimaanlage, die mitheizt
 
-Im Raum-Editor beim Gerät die Rolle **Klimaanlage** wählen. Home Rhythm vergleicht laufend:
+Im Raum-Editor beim Gerät die Rolle **Klimaanlage** wählen. HomeRhythm vergleicht laufend:
 *Gaspreis ÷ Wirkungsgrad* gegen *Strompreis ÷ COP bei aktueller Außentemperatur* (COP-Werte aus dem Datenblatt,
 mindestens zwei Punkte). Die Karte zeigt, ab welcher Außentemperatur das Klima billiger ist. Dazu: Heizkörper als
 Reserve, „Heizkörper helfen mit“, Einsatzgrenze, nachts kein Klima, Kühlen in der Heißphase mit optionalem Vorkühlen.
 
-### So entscheidet Home Rhythm (erste zutreffende Regel gewinnt)
+### So entscheidet HomeRhythm (erste zutreffende Regel gewinnt)
 
 1. Jahreszeit ist keine Heiz-Jahreszeit → aus
 2. Raumregel, die sich auf den Urlaub bezieht
@@ -159,9 +159,12 @@ Ein Zeitplan schaltet eine **frei zusammengestellte Gruppe** – z. B. „alle R
 | Urlaub zu Hause an Werktagen | eigene / wie Samstag / wie Sonntag |
 | Urlaub zu Hause am Wochenende | unverändert / eigene / wie Samstag / wie Sonntag / wie Urlaub-Werktage |
 
-Vorrang: Feiertag vor Urlaub zu Hause vor Wochentag. Je Tagesart **Öffnen** (Uhrzeit oder Sonne ± mit „frühestens“;
-ganz auf oder Position %) bzw. **Einschalten**; **Schließen** eine Zeit für alle oder je Tagesart – eine Schließzeit
-vor der Öffnungszeit (z. B. 00:30) gehört zum Vorabend. Dazu Absicherung („um 23:00 nochmal schließen“) und
+Vorrang: Feiertag vor Urlaub zu Hause vor Wochentag. Je Tagesart **Öffnen** (Uhrzeit oder Sonne ±; ganz auf oder
+Position %) bzw. **Einschalten**; **Schließen** eine Zeit für alle oder je Tagesart – eine Schließzeit vor 12:00
+(z. B. 00:30) gehört zum Vorabend. Jede Sonnenzeit kann über „**+ Grenzen**“ ein *frühestens* und ein *spätestens*
+bekommen, z. B. „Sonnenuntergang + 1 Std., nicht vor 18:00, spätestens 23:00“: Im Winter wird dann um 18:00
+geschaltet, im Sommer höchstens um 23:00. Ein Jahresband zeigt, an welchen Tagen welche Grenze greift.
+Dazu Absicherung („um 23:00 nochmal schließen“ – zeigt an, ob sie gilt) und
 „**Zeitplan gilt**“: immer, nicht bei „Urlaub unterwegs“, nur in einer Jahreszeit, **nur von … bis …** (jedes Jahr,
 z. B. 28.11.–6.1., auch über den Jahreswechsel) oder eigene Bedingungen (auch „Datum zwischen …“).
 Was von einem Sensor abhängt (z. B. Hitzeschutz ab 25 °C), ist eine **Reaktion**, kein Zeitplan.
@@ -215,10 +218,10 @@ Beispiele: Bewegungslicht mit Warnblinken, Timer-Knopf für die Bewässerung, Sa
 ### Auch als Home-Assistant-Automation
 
 Pro Ablauf gibt es den Schalter **„Auch als Automation in Home Assistant anlegen“** (Standard: aus). Dann schreibt
-Home Rhythm eine Automation mit der ID `home_rhythm_…` in `automations.yaml`, und **Home Assistant** führt sie aus –
-auch wenn Home Rhythm deaktiviert ist; sie erscheint in den Ablaufverfolgungen. Bearbeitet wird weiterhin in der Karte.
-Andere Automationen bleiben unangetastet; vor jedem Schreiben legt Home Rhythm `automations.yaml.home_rhythm.bak`
-an. Nutzt deine `automations.yaml` `!include` oder `!secret`, schreibt Home Rhythm dort nichts hinein. Nicht übertragbar sind „nachprüfen & wiederholen“, Zufall und Überspringen – die Karte weist darauf hin.
+HomeRhythm eine Automation mit der ID `home_rhythm_…` in `automations.yaml`, und **Home Assistant** führt sie aus –
+auch wenn HomeRhythm deaktiviert ist; sie erscheint in den Ablaufverfolgungen. Bearbeitet wird weiterhin in der Karte.
+Andere Automationen bleiben unangetastet; vor jedem Schreiben legt HomeRhythm `automations.yaml.home_rhythm.bak`
+an. Nutzt deine `automations.yaml` `!include` oder `!secret`, schreibt HomeRhythm dort nichts hinein. Nicht übertragbar sind „nachprüfen & wiederholen“, Zufall und Überspringen – die Karte weist darauf hin.
 Bedingungen, die sich in HA nicht abbilden lassen (z. B. „Zeitplan ist …“), verhindern das Anlegen, statt die
 Automation stillschweigend anders laufen zu lassen.
 
@@ -243,7 +246,7 @@ Raum bearbeiten → Schritt 1–3. Ohne Einstellung bleibt alles wie bisher.
 | Art | Sensoren | Korrektur |
 |---|---|---|
 | FRITZ!DECT | Fühler am Thermostat · Sensoren im Raum · in der Fritz!Box eingestellt (z. B. FRITZ!DECT 440) | keine · fest · beobachten (nur mit Sensoren im Raum) |
-| Better Thermostat / andere Regel-Integration | stellt die Integration ein – Home Rhythm zeigt und prüft ihn | macht die Integration |
+| Better Thermostat / andere Regel-Integration | stellt die Integration ein – HomeRhythm zeigt und prüft ihn | macht die Integration |
 | Thermostat direkt (Sonoff & Co.) | Fühler am Thermostat · Sensoren im Raum | mit Sensoren: Raumwert wird ans Thermostat gesendet; sonst keine · fest |
 
 - **Fest:** misst der Fühler 1,5 °C zu viel, −1,5 eintragen. Das Thermostat bekommt dann Soll + 1,5 (Display zeigt
@@ -254,7 +257,7 @@ Raum bearbeiten → Schritt 1–3. Ohne Einstellung bleibt alles wie bisher.
 
 ### Raumkarte fürs Dashboard (ab 0.9.8)
 
-Dashboard bearbeiten → Karte hinzufügen → „Home Rhythm“ → Raum wählen. Oder YAML:
+Dashboard bearbeiten → Karte hinzufügen → „HomeRhythm“ → Raum wählen. Oder YAML:
 
 ```yaml
 type: custom:home-rhythm-card
@@ -291,7 +294,7 @@ Viele Karten auf einer Seite laden die Daten nur einmal und teilen sich ein Abo.
 leichte Abfrage `home_rhythm/rooms` (auch ohne Admin): je Raum `id`, `name`, `area_id`, `enabled`,
 `climate_entities`, `ac_entities`, `room_temp_entities` (die Raumfühler) mit `room_temp_source`
 (`sensors` · `box` · `integration` · `device`), `ist`, `soll`, `hvac_mode`, `level`, `level_name`, `manual_until`,
-`unavailable`. Mit `home_rhythm/subscribe` meldet Home Rhythm jede Änderung (ohne Daten), danach neu abfragen.
+`unavailable`. Mit `home_rhythm/subscribe` meldet HomeRhythm jede Änderung (ohne Daten), danach neu abfragen.
 
 + / − und die Schnellwahl lösen eine Hand-Änderung für den Raum aus (mit „Zurück zum Plan“). Stufen und „Aus“ fragen
 „bis wann?“. Das Symbol öffnet das Bedien-Fenster (ein Entwurf, bis du „Übernehmen“ tippst), der Name klappt den Raum auf. Bedienen dürfen alle Benutzer,
@@ -304,11 +307,11 @@ Raum bearbeiten → Schritt 4. Ein Bedienteil löst eine Hand-Änderung für den
 
 1. **Gerät wählen** (Taster oder Bedienteil mit Anzeige, z. B. SONOFF SNZB-01M, Hue Dimmer, IKEA, Aqara W100).
 2. Je Funktion **„anlernen“** antippen und am Gerät die Taste drücken: wärmer · kälter · zurück zum Plan ·
-   Booster 1 Std. · Komfort bis zum nächsten Wechsel · aus bis zum nächsten Wechsel. Home Rhythm merkt sich genau,
+   Booster 1 Std. · Komfort bis zum nächsten Wechsel · aus bis zum nächsten Wechsel. HomeRhythm merkt sich genau,
    was das Gerät dabei meldet (Ereignis, Aktion, Sollwert hoch/runter, Ein/Aus oder – beim W100 – die Mitteltaste
    als Meldung ohne Wert). Nicht belegte Tasten bleiben frei für eigene Automationen.
 3. Geräte mit Anzeige: Häkchen **„Sollwert des Raums auf dem Display zeigen“**. Nach jedem erkannten Tastendruck
-   schreibt Home Rhythm den Sollwert sofort zurück – das W100 aktualisiert sein Display erst dann.
+   schreibt HomeRhythm den Sollwert sofort zurück – das W100 aktualisiert sein Display erst dann.
 
 Tipp W100: `temp_threshold` auf 0,1–0,2 stellen, wenn es auch Raumsensor ist.
 
@@ -346,8 +349,8 @@ data:
 Erst wenn alle Räume und Abläufe angelegt sind:
 
 1. Bisherige Heizungs-Automationen und Zeitplan-Integrationen (z. B. Scheduler, Thermostat-Timeline) deaktivieren.
-2. Zeitpläne in der Fritz!Box bzw. am Thermostat ausschalten – sonst meldet Home Rhythm sie als fremde Steuerung.
-3. In Better Thermostat / Versatile Thermostat keine Presets oder Zeitpläne nutzen – das übernimmt Home Rhythm.
+2. Zeitpläne in der Fritz!Box bzw. am Thermostat ausschalten – sonst meldet HomeRhythm sie als fremde Steuerung.
+3. In Better Thermostat / Versatile Thermostat keine Presets oder Zeitpläne nutzen – das übernimmt HomeRhythm.
 4. Better Thermostat mit Fritz!DECT: Kalibrierungsmodus nicht „KI zeitbasiert“ (dreht bis 28 °C auf), sondern mit externem Sensor „Nur externer Sensorversatz“, ohne externen Sensor „Keine Kalibrierung“.
 5. Für Rollläden und Licht: die alten Automationen der Geräte deaktivieren, die jetzt ein Ablauf schaltet.
 
@@ -355,11 +358,11 @@ Erst wenn alle Räume und Abläufe angelegt sind:
 
 ## Datenschutz und Sicherheit
 
-- **Alles lokal.** Home Rhythm stellt keine Verbindung ins Internet her, nutzt keine Cloud, sammelt keine Telemetrie.
+- **Alles lokal.** HomeRhythm stellt keine Verbindung ins Internet her, nutzt keine Cloud, sammelt keine Telemetrie.
 - **Gespeichert** wird in `/config/.storage/home_rhythm.data`: Räume, Stufen, Abläufe, laufende Hand-Änderungen, die
   letzten fremden Änderungen je Thermostat (mit Name und ID des HA-Benutzers bzw. der Automation, die geändert hat) und
   ein kurzes Protokoll je Ablauf (höchstens 30 Einträge). Tagesmittel der Außentemperatur für die Jahreszeit-Automatik.
-- **Beim Löschen der Integration** werden diese Daten und alle von Home Rhythm angelegten Automationen entfernt.
+- **Beim Löschen der Integration** werden diese Daten und alle von HomeRhythm angelegten Automationen entfernt.
 - **Sicherung (Export)** enthält nur die Einrichtung – keine Protokolle, Hand-Änderungen oder Benutzernamen. Die Datei
   enthält aber die Namen deiner Geräte und Räume; teile sie entsprechend vorsichtig.
 - **Rechte:** Einrichtung ändern (Räume, Stufen, Abläufe, Import/Export, Test) dürfen nur **Administratoren**.
@@ -382,11 +385,11 @@ Sicherheitslücke gefunden? Bitte nicht als öffentliches Issue, sondern über �
 ## Fehlersuche
 
 - **Karte erscheint nicht / alte Version:** Browser-Cache leeren bzw. in der App den Frontend-Cache leeren.
-- **„Hand-Änderung“, die keine war:** Funk-Thermostate übernehmen Werte oft erst nach Minuten. Home Rhythm wartet
+- **„Hand-Änderung“, die keine war:** Funk-Thermostate übernehmen Werte oft erst nach Minuten. HomeRhythm wartet
   3 Minuten und sendet nach 10 Minuten erneut. Unter „Zuletzt von außen geändert“ steht, wer geändert hat.
   ✕ am Schild setzt zurück.
 - **Ein Ablauf schaltet nicht:** Protokoll im aufgeklappten Ablauf ansehen; Bedingung erfüllt? Geräte erreichbar?
-  Hausmodi-Helfer verfügbar? (Ist einer „nicht verfügbar“, schaltet Home Rhythm sicherheitshalber nichts.)
+  Hausmodi-Helfer verfügbar? (Ist einer „nicht verfügbar“, schaltet HomeRhythm sicherheitshalber nichts.)
 - **Protokoll für Entwickler:** in `configuration.yaml`
 
   ```yaml
@@ -397,7 +400,7 @@ Sicherheitslücke gefunden? Bitte nicht als öffentliches Issue, sondern über �
 
 ## Entfernen
 
-Einstellungen → Geräte & Dienste → Home Rhythm → Löschen, dann den Ordner `custom_components/home_rhythm` entfernen
+Einstellungen → Geräte & Dienste → HomeRhythm → Löschen, dann den Ordner `custom_components/home_rhythm` entfernen
 (bzw. in HACS deinstallieren) und neu starten. Die Geräte bleiben auf dem letzten Wert.
 
 ---
@@ -427,7 +430,7 @@ brauchen zusätzlich `pip install playwright && playwright install chromium`, so
 
 ## English summary
 
-**Home Rhythm** is a local-only Home Assistant integration with its own dashboard card (German UI). It controls all
+**HomeRhythm** is a local-only Home Assistant integration with its own dashboard card (German UI). It controls all
 thermostats and AC units by weekly schedules and house modes (season, vacation, holidays, presence, events), explains
 for every room *why* a temperature applies and until when, detects manual changes and foreign control, and decides
 whether gas or the heat pump/AC is cheaper. Its *Abläufe* (flows) switch freely grouped covers, lights and plugs at

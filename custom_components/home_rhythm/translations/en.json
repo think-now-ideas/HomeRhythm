@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Rhythm – Hausmodi",
+        "title": "HomeRhythm – Hausmodi",
         "description": "Which helpers define the house modes?",
         "data": {
           "season_entity": "Season entity",
@@ -20,8 +20,8 @@
         }
       },
       "energy": {
-        "title": "Home Rhythm – Energie",
-        "description": "For rooms with an air conditioner: Home Rhythm compares gas and electricity and heats with the cheaper source.",
+        "title": "HomeRhythm – Energie",
+        "description": "For rooms with an air conditioner: HomeRhythm compares gas and electricity and heats with the cheaper source.",
         "data": {
           "outdoor_entities": "Outdoor temperature sensors or weather",
           "outdoor_aggregate": "Combine several sensors",
@@ -44,7 +44,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Home Rhythm",
+        "title": "HomeRhythm",
         "menu_options": {
           "modes": "House modes",
           "energy": "Energy: outdoor temperature and prices"
@@ -70,7 +70,7 @@
       },
       "energy": {
         "title": "Energy",
-        "description": "For rooms with an air conditioner: Home Rhythm compares gas and electricity and heats with the cheaper source.",
+        "description": "For rooms with an air conditioner: HomeRhythm compares gas and electricity and heats with the cheaper source.",
         "data": {
           "outdoor_entities": "Outdoor temperature sensors or weather",
           "outdoor_aggregate": "Combine several sensors",
@@ -126,7 +126,7 @@
       "fields": {
         "room": {
           "name": "Room",
-          "description": "Name or ID of the Home Rhythm room"
+          "description": "Name or ID of the HomeRhythm room"
         },
         "level": {
           "name": "Level",
@@ -148,7 +148,7 @@
       "fields": {
         "room": {
           "name": "Room",
-          "description": "Name or ID of the Home Rhythm room"
+          "description": "Name or ID of the HomeRhythm room"
         }
       }
     }

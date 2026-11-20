@@ -92,11 +92,11 @@ class FlowRunner:
                 self.flows[fid] = F.normalize_flow(raw)
             except (ValueError, TypeError, KeyError, AttributeError) as err:
                 self.broken[fid] = raw  # nicht verwerfen – beim Speichern unverändert behalten
-                _LOGGER.warning("Home Rhythm: Ablauf %s nicht geladen: %s", fid, err)
+                _LOGGER.warning("HomeRhythm: Ablauf %s nicht geladen: %s", fid, err)
         for fid in list(self.flows):  # Zirkelbezüge („Zeitplan ist …“) beim Laden entschärfen
             if self._cycle(fid, F.flow_refs(self.flows[fid])):
                 self.flows[fid]["enabled"] = False
-                _LOGGER.warning("Home Rhythm: Ablauf %s verweist im Kreis auf sich selbst – ausgeschaltet", fid)
+                _LOGGER.warning("HomeRhythm: Ablauf %s verweist im Kreis auf sich selbst – ausgeschaltet", fid)
         for fid, entries in (stored.get("logs") or {}).items():
             if fid in self.flows:
                 self.logs[fid] = deque(entries[-LOG_SIZE:], maxlen=LOG_SIZE)
@@ -366,7 +366,7 @@ class FlowRunner:
                     await self._exec_point(fid, flow, point, idx, used)
                     changed = True
             except Exception:  # noqa: BLE001
-                _LOGGER.exception("Home Rhythm: Zeitplan %s um %s fehlgeschlagen", flow.get("name"), F.hm(m))
+                _LOGGER.exception("HomeRhythm: Zeitplan %s um %s fehlgeschlagen", flow.get("name"), F.hm(m))
         if changed:
             self.ctrl.schedule_save()
             self._notify()
@@ -421,7 +421,7 @@ class FlowRunner:
                 targets.append((eid, pos))
             except Exception as err:  # noqa: BLE001 – ein Gerät darf die anderen nicht blockieren
                 failed.append(self.ctrl._name(eid))  # noqa: SLF001
-                _LOGGER.warning("Home Rhythm: %s konnte %s nicht schalten: %s", flow["name"], eid, err)
+                _LOGGER.warning("HomeRhythm: %s konnte %s nicht schalten: %s", flow["name"], eid, err)
         act = F.ACTION_NAMES[point["action"]] + (f" {point.get('position')} %" if point["action"] == "position" else "")
         text = f"{act}: {done} geschaltet" + (f", {skipped} standen schon so" if skipped else "") + (f" – nicht erreicht: {', '.join(failed)}" if failed else "")
         self._log(fid, "bad" if failed else "ok", text)
@@ -456,7 +456,7 @@ class FlowRunner:
                 try:
                     await self._switch(eid, point["action"], pos, point.get("brightness"), context)
                 except Exception as err:  # noqa: BLE001
-                    _LOGGER.warning("Home Rhythm: erneutes Schalten von %s fehlgeschlagen: %s", eid, err)
+                    _LOGGER.warning("HomeRhythm: erneutes Schalten von %s fehlgeschlagen: %s", eid, err)
             self._log(fid, "bad", f"Nachprüfung: {names} nicht wie geplant – Versuch {attempt + 1}")
             self._schedule_verify(fid, point, missing, attempt + 1)
         self.ctrl.schedule_save()
@@ -728,7 +728,7 @@ class FlowRunner:
                 self.native_error = "; ".join(problems) or None
             except Exception as err:  # noqa: BLE001 – Zeitpläne sollen trotzdem gespeichert werden
                 self.native_error = str(err)
-                _LOGGER.error("Home Rhythm: Automationen konnten nicht geschrieben werden: %s", err)
+                _LOGGER.error("HomeRhythm: Automationen konnten nicht geschrieben werden: %s", err)
 
     # ------------------------------------------------------------------ Reaktionen
     def _subscribe_triggers(self) -> None:
@@ -856,7 +856,7 @@ class FlowRunner:
                 elif do == "notify":
                     try:
                         if step["target"] == "persistent":
-                            await self._call("persistent_notification", "create", {"title": "Home Rhythm", "message": step["message"]}, context)
+                            await self._call("persistent_notification", "create", {"title": "HomeRhythm", "message": step["message"]}, context)
                         else:
                             domain, service = step["target"].split(".", 1)
                             await self._call(domain, service, {"message": step["message"]}, context)
@@ -872,7 +872,7 @@ class FlowRunner:
             self._log(fid, "info", f"ausgelöst durch {why}, neu gestartet bzw. abgebrochen")
             raise
         except Exception:  # noqa: BLE001
-            _LOGGER.exception("Home Rhythm: Reaktion %s fehlgeschlagen", flow["name"])
+            _LOGGER.exception("HomeRhythm: Reaktion %s fehlgeschlagen", flow["name"])
             self._log(fid, "bad", "Fehler – siehe Protokoll von Home Assistant")
         finally:
             if self._tasks.get(fid) is asyncio.current_task():
@@ -890,7 +890,7 @@ class FlowRunner:
             await self._switch(eid, do, position, brightness, context)
         except Exception as err:  # noqa: BLE001
             failed.append(self.ctrl._name(eid))  # noqa: SLF001
-            _LOGGER.warning("Home Rhythm: %s nicht geschaltet: %s", eid, err)
+            _LOGGER.warning("HomeRhythm: %s nicht geschaltet: %s", eid, err)
 
     # ------------------------------------------------------------------ Daten für die Karte
     def _names(self) -> dict[str, str]:
@@ -1033,6 +1033,7 @@ class FlowRunner:
             out["day_labels"] = [F.day_label(flow, c, d) for d, _s, c in week]
             out["dates"] = [d.isoformat() for d, _s, _c in week]
             out["sun"] = [{"rise": s.sunrise, "set": s.sunset} for _d, s, _c in week]
+            out["sun_year"] = self.ctrl.sun_year(dt_util.now().year)  # Jahresband bei „frühestens/spätestens“
             out["point_texts"] = [F.point_text(p) for p in flow["points"]]
             if flow.get("mode") == "simple":
                 out["points"] = flow["points"]  # für „Erweitert“: so sehen die Schaltpunkte aus

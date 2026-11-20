@@ -1,7 +1,7 @@
-"""Konstanten für Home Rhythm."""
+"""Konstanten für HomeRhythm."""
 
 DOMAIN = "home_rhythm"
-VERSION = "0.9.14"
+VERSION = "0.9.15"
 
 CONF_SEASON_ENTITY = "season_entity"
 CONF_WINTER_VALUES = "winter_values"

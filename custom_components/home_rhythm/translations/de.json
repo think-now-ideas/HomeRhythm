@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Rhythm – Hausmodi",
+        "title": "HomeRhythm – Hausmodi",
         "description": "Welche Helfer bestimmen die Hausmodi? Räume und Zeiten richtest du danach in der Home-Rhythm-Karte ein.",
         "data": {
           "season_entity": "Jahreszeit (Entität)",
@@ -20,8 +20,8 @@
         }
       },
       "energy": {
-        "title": "Home Rhythm – Energie",
-        "description": "Für Räume mit Klimaanlage: Home Rhythm vergleicht Gas und Strom und heizt mit der günstigeren Quelle. Preise in Cent pro kWh; Entitäten in €/kWh werden umgerechnet. Brennwertkessel ca. 90–98 %, älterer Kessel 80–90 %.",
+        "title": "HomeRhythm – Energie",
+        "description": "Für Räume mit Klimaanlage: HomeRhythm vergleicht Gas und Strom und heizt mit der günstigeren Quelle. Preise in Cent pro kWh; Entitäten in €/kWh werden umgerechnet. Brennwertkessel ca. 90–98 %, älterer Kessel 80–90 %.",
         "data": {
           "outdoor_entities": "Außentemperatur – ein oder mehrere Sensoren oder Wetter",
           "outdoor_aggregate": "Mehrere Sensoren zusammenfassen",
@@ -44,7 +44,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Home Rhythm",
+        "title": "HomeRhythm",
         "menu_options": {
           "modes": "Hausmodi",
           "energy": "Energie: Außentemperatur und Preise"
@@ -70,7 +70,7 @@
       },
       "energy": {
         "title": "Energie",
-        "description": "Für Räume mit Klimaanlage: Home Rhythm vergleicht Gas und Strom und heizt mit der günstigeren Quelle. Preise in Cent pro kWh; Entitäten in €/kWh werden umgerechnet. Brennwertkessel ca. 90–98 %, älterer Kessel 80–90 %.",
+        "description": "Für Räume mit Klimaanlage: HomeRhythm vergleicht Gas und Strom und heizt mit der günstigeren Quelle. Preise in Cent pro kWh; Entitäten in €/kWh werden umgerechnet. Brennwertkessel ca. 90–98 %, älterer Kessel 80–90 %.",
         "data": {
           "outdoor_entities": "Außentemperatur – ein oder mehrere Sensoren oder Wetter",
           "outdoor_aggregate": "Mehrere Sensoren zusammenfassen",
@@ -126,7 +126,7 @@
       "fields": {
         "room": {
           "name": "Raum",
-          "description": "Name oder ID des Raums in Home Rhythm"
+          "description": "Name oder ID des Raums in HomeRhythm"
         },
         "level": {
           "name": "Stufe",
@@ -148,7 +148,7 @@
       "fields": {
         "room": {
           "name": "Raum",
-          "description": "Name oder ID des Raums in Home Rhythm"
+          "description": "Name oder ID des Raums in HomeRhythm"
         }
       }
     }

@@ -142,6 +142,7 @@ class HomeRhythmController:
         self._cold_since: dict[str, datetime] = {}
         self._outdoor_samples: deque[tuple[datetime, float]] = deque(maxlen=2000)
         self._sun_cache: dict[str, tuple[datetime, datetime]] = {}
+        self._sun_year_cache: dict[int, dict[str, Any]] = {}
         self.runner = None  # FlowRunner (Zeitpläne und Reaktionen), wird in __init__.py gesetzt
         self.stopped = False
         self.foreign_log: dict[str, list[dict[str, Any]]] = {}  # Gerät → fremde Änderungen (neueste zuletzt)
@@ -180,7 +181,7 @@ class HomeRhythmController:
                 try:
                     room["controls"] = CT.normalize(room["controls"], all_entities(room), self.hass)
                 except ValueError:
-                    _LOGGER.warning("Home Rhythm: Bedienteile von %s nicht übernommen", room.get("name"))
+                    _LOGGER.warning("HomeRhythm: Bedienteile von %s nicht übernommen", room.get("name"))
                     room["controls"] = []
         self.foreign_log = data.get("foreign", {}) or {}
         self.stored_flows = data.get("flows") or {}  # wird vom FlowRunner übernommen
@@ -217,7 +218,7 @@ class HomeRhythmController:
             if room.get("kind") not in RT.KINDS:  # 0.9.5: Art aus den Thermostaten – Verhalten bleibt gleich
                 room["kind"] = self.derive_kind(room)
             if room.pop("programs", None):  # 0.7.0: Rollläden/Licht im Raum – ab 0.8.0 als Abläufe
-                _LOGGER.info("Home Rhythm: Rollläden/Licht-Einstellungen aus Raum %s entfernt – bitte als Ablauf anlegen", room.get("name"))
+                _LOGGER.info("HomeRhythm: Rollläden/Licht-Einstellungen aus Raum %s entfernt – bitte als Ablauf anlegen", room.get("name"))
         for room_id, m in (data.get("manual") or {}).items():
             try:
                 self.manual[room_id] = E.Manual(
@@ -460,7 +461,7 @@ class HomeRhythmController:
         try:
             await self._async_room_temps(now)
         except Exception:  # noqa: BLE001 – Senden/Beobachten darf die übrige Steuerung nie aufhalten
-            _LOGGER.exception("Home Rhythm: Raumtemperatur (Senden/Beobachten) fehlgeschlagen")
+            _LOGGER.exception("HomeRhythm: Raumtemperatur (Senden/Beobachten) fehlgeschlagen")
         if changed:
             await self.async_save()
             async_dispatcher_send(self.hass, SIGNAL_UPDATED)
@@ -515,7 +516,7 @@ class HomeRhythmController:
         self._own_contexts.append(ctx.id)
         self._season_set = (want, dt_util.utcnow())
         await self.hass.services.async_call(eid.split(".")[0], "select_option", {ATTR_ENTITY_ID: eid, "option": want}, blocking=True, context=ctx)
-        _LOGGER.info("Home Rhythm: Jahreszeit automatisch auf %s (Ø %s °C)", want, self.season_average()[0])
+        _LOGGER.info("HomeRhythm: Jahreszeit automatisch auf %s (Ø %s °C)", want, self.season_average()[0])
 
     async def async_set_season_auto(self, enabled: bool) -> None:
         self.season_auto = enabled
@@ -767,7 +768,7 @@ class HomeRhythmController:
             try:
                 await self.controls.async_sync()  # Bedienteile mit Anzeige zeigen den Sollwert des Raums
             except Exception:  # noqa: BLE001
-                _LOGGER.exception("Home Rhythm: Bedienteile nicht aktualisiert")
+                _LOGGER.exception("HomeRhythm: Bedienteile nicht aktualisiert")
 
     async def async_room_manual(self, room_id: str, temperature: float | None, hvac: str, until: datetime | None, source: str) -> None:
         """Hand-Änderung für den ganzen Raum (z. B. von einem Bedienteil) – Werte als Raumtemperatur."""
@@ -785,7 +786,7 @@ class HomeRhythmController:
             for e in room_entities(room):
                 self.manual[f"{room_id}|{e}"] = manual
         self._forget_sent(room_id)
-        _LOGGER.info("Home Rhythm: Hand-Änderung in %s (%s)", room_id, source)
+        _LOGGER.info("HomeRhythm: Hand-Änderung in %s (%s)", room_id, source)
         await self.async_save()
         await self.async_update(apply=True)
 
@@ -899,6 +900,33 @@ class HomeRhythmController:
         plats = [(e.platform if (e := reg.async_get(eid)) else None) for eid in room_entities(room)]
         return RT.kind_for(plats)
 
+    def kind_hint(self, room: dict[str, Any]) -> dict[str, Any] | None:
+        """0.9.15: Hinweis „Art passt nicht zu den Thermostaten“ (z. B. nach einem Thermostat-Tausch), sonst None."""
+        kind = room.get("kind")
+        if kind not in RT.KINDS:
+            return None
+        reg = er.async_get(self.hass)
+        plats = [(e.platform if (e := reg.async_get(eid)) else None) for eid in room_entities(room)]
+        want = RT.kind_mismatch(kind, plats)
+        if not want:
+            return None
+        hint_id = f"kind:{room['id']}:{kind}:{want}"  # neue Art → neue ID → Hinweis kommt bei neuem Fehlstand wieder
+        if hint_id in self.dismissed:
+            return None
+        return {"id": hint_id, "kind": kind, "suggest": want}
+
+    async def async_set_kind(self, room_id: str, kind: str) -> None:
+        """Art eines Raums umstellen (Knopf am Hinweis). Alles andere am Raum bleibt; Unpassendes fällt weg wie im Editor."""
+        room = self.rooms.get(room_id)
+        if room is None:
+            raise ValueError("Unbekannter Raum")
+        if kind not in RT.KINDS:
+            raise ValueError("Unbekannte Art von Thermostat")
+        data = {**room, "kind": kind}
+        if data.get("temp_source") == "box" and kind != "fritz":
+            data["temp_source"] = "device"  # „in der Fritz!Box eingestellt“ gibt es nur bei FRITZ!DECT
+        await self.async_save_room(data)
+
     def manual_key(self, room_id: str, entity_id: str) -> str:
         room = self.rooms[room_id]
         if entity_id in room_acs(room) or not room.get("linked", True):
@@ -1011,7 +1039,7 @@ class HomeRhythmController:
             )
             _LOGGER.debug("%s: %s gesetzt", entity_id, want)
         except Exception as err:  # noqa: BLE001 – ein Gerät darf die anderen nicht blockieren
-            _LOGGER.warning("Home Rhythm konnte %s nicht setzen: %s", entity_id, err)
+            _LOGGER.warning("HomeRhythm konnte %s nicht setzen: %s", entity_id, err)
 
     # ------------------------------------------------------------------ Sicherung
     def export_config(self) -> dict[str, Any]:
@@ -1056,7 +1084,7 @@ class HomeRhythmController:
 
     # ------------------------------------------------------------------ Hilfen für den FlowRunner
     def own_context(self) -> Context:
-        """Kontext für eigene Befehle – so erkennt Home Rhythm sie später nicht als „fremd“."""
+        """Kontext für eigene Befehle – so erkennt HomeRhythm sie später nicht als „fremd“."""
         ctx = Context()
         self._own_contexts.append(ctx.id)
         return ctx
@@ -1090,6 +1118,33 @@ class HomeRhythmController:
     def sun_for(self, day) -> F.Sun:
         rise, sets = self.sun_times(day)
         return F.Sun(rise.hour * 60 + rise.minute, sets.hour * 60 + sets.minute)
+
+    def sun_year(self, year: int) -> dict[str, Any]:
+        """Sonnenauf-/-untergang (Minute des Tages, lokal) für jeden Tag eines Jahres.
+
+        Für das Jahresband im Zeitplan-Editor („frühestens 18:00 greift ca. 27.10.–27.1.“). Eigener Speicher je Jahr,
+        damit der kleine Tages-Speicher von ``sun_times`` nicht verdrängt wird. Standort ändert sich praktisch nie –
+        nach einem Neustart wird ohnehin neu gerechnet.
+        """
+        if year not in self._sun_year_cache:
+            from homeassistant.helpers.sun import get_astral_event_date  # noqa: PLC0415
+
+            rise_l: list[int] = []
+            set_l: list[int] = []
+            day = date(year, 1, 1)
+            while day.year == year:
+                rise = get_astral_event_date(self.hass, "sunrise", day)
+                sets = get_astral_event_date(self.hass, "sunset", day)
+                if rise is None or sets is None:  # Polartag/-nacht: wie sun_times
+                    rise_l.append(7 * 60)
+                    set_l.append(18 * 60)
+                else:
+                    r, s = dt_util.as_local(rise), dt_util.as_local(sets)
+                    rise_l.append(r.hour * 60 + r.minute)
+                    set_l.append(s.hour * 60 + s.minute)
+                day += timedelta(days=1)
+            self._sun_year_cache = {year: {"year": year, "rise": rise_l, "set": set_l}}  # nur ein Jahr merken
+        return self._sun_year_cache[year]
 
     # ------------------------------------------------------------------ Hand-Änderungen
     def _note_heating(self, entity_id: str, state) -> None:
@@ -1209,7 +1264,7 @@ class HomeRhythmController:
             plan = self._desired(entity_id, result) if result else None
             if plan is not None:
                 self._last_sent[key] = {**(self._last_sent.get(key) or {}), "want": plan, "at": dt_util.utcnow(), "rule": result.rule}
-            _LOGGER.info("Home Rhythm: %s meldet Höchstwert ohne HA-Ursache – nicht als Hand-Änderung übernommen", entity_id)
+            _LOGGER.info("HomeRhythm: %s meldet Höchstwert ohne HA-Ursache – nicht als Hand-Änderung übernommen", entity_id)
             self.hass.async_create_task(self.async_save())
             return
         self._log_foreign(entity_id, kind, name, ref, new)
@@ -1240,7 +1295,7 @@ class HomeRhythmController:
             "at": dt_util.utcnow() - timedelta(seconds=GRACE_SECONDS),
             "rule": result.rule if result and result.rule in (E.RULE_AWAY, E.RULE_ABSENT) else None,
         }
-        _LOGGER.info("Home Rhythm: Hand-Änderung in %s an %s (%s)", room_id, entity_id, source)
+        _LOGGER.info("HomeRhythm: Hand-Änderung in %s an %s (%s)", room_id, entity_id, source)
         self.hass.async_create_task(self._async_after_manual())
 
     async def _async_after_manual(self) -> None:
@@ -1410,7 +1465,7 @@ class HomeRhythmController:
     async def async_reset_hints(self, room_id: str) -> None:
         room = self.rooms.get(room_id) or {}
         ents = all_entities(room)
-        self.dismissed = {h for h in self.dismissed if not any(f":{e}:" in h for e in ents)}
+        self.dismissed = {h for h in self.dismissed if not any(f":{e}:" in h for e in ents) and not h.startswith(f"kind:{room_id}:")}
         await self.async_save()
         self.hass.bus.async_fire(EVENT_UPDATED, {})
 
@@ -1754,7 +1809,7 @@ class HomeRhythmController:
         return {e.entity_id for e in er.async_entries_for_device(ent_reg, device_id)}
 
     def _room_uses(self, room: dict[str, Any], device_id: str | None) -> list[dict[str, Any]]:
-        """Wofür benutzt Home Rhythm dieses Gerät? (Heizung: Rolle im Raum; Abläufe kommen in uses_flows dazu)."""
+        """Wofür benutzt HomeRhythm dieses Gerät? (Heizung: Rolle im Raum; Abläufe kommen in uses_flows dazu)."""
         ents = self._device_entities(device_id)
         uses: list[dict[str, Any]] = []
         name = room["name"]
@@ -1956,7 +2011,7 @@ class HomeRhythmController:
             try:
                 rt = self.room_temp_info(room_id, room)
             except Exception:  # noqa: BLE001 – reine Anzeige: darf die Karte nie leer machen
-                _LOGGER.exception("Home Rhythm: Raumtemperatur-Anzeige für %s fehlgeschlagen", room_id)
+                _LOGGER.exception("HomeRhythm: Raumtemperatur-Anzeige für %s fehlgeschlagen", room_id)
                 rt = {"kind": room.get("kind"), "source": "device", "correction": "none", "correction_value": 0, "value": None,
                       "sensors": [], "integration_sensor": None, "push": [], "observe": None, "checks": []}
             if rt["value"] is not None:
@@ -1991,9 +2046,10 @@ class HomeRhythmController:
                     "climate": climate,
                     "energy": self.room_energy.get(room_id),
                     "hints": self.hints_for(room),
+                    "kind_hint": self.kind_hint(room),
                     "humidity": self._humidity(room),
                     "devices": self.devices_of(room),
-                    "dismissed_count": sum(1 for h in self.dismissed if any(f":{e}:" in h for e in all_entities(room))),
+                    "dismissed_count": sum(1 for h in self.dismissed if any(f":{e}:" in h for e in all_entities(room)) or h.startswith(f"kind:{room_id}:")),
                     "foreign": sorted(
                         ({**e, "entity_id": eid} for eid in all_entities(room) for e in self.foreign_log.get(eid, [])),
                         key=lambda e: e["at"],
@@ -2298,7 +2354,7 @@ class HomeRhythmController:
                 await self.hass.services.async_call("number", "set_value", {"entity_id": num, "value": value}, blocking=False, context=Context())
                 self._pushed[entity_id] = {"value": value, "at": now}
             except Exception as err:  # noqa: BLE001 – Senden darf die Regelung nie stören
-                _LOGGER.warning("Home Rhythm: Raumwert an %s nicht gesendet: %s", num, err)
+                _LOGGER.warning("HomeRhythm: Raumwert an %s nicht gesendet: %s", num, err)
         if sel and (sst := self.hass.states.get(sel)) and sst.state != RT.REMOTE_OPTION and RT.REMOTE_OPTION in (sst.attributes.get("options") or []):
             tried = self._remote_tried.get(entity_id)
             if tried is None or now - tried >= RT.REMOTE_RETRY:
@@ -2306,7 +2362,7 @@ class HomeRhythmController:
                 try:
                     await self.hass.services.async_call("select", "select_option", {"entity_id": sel, "option": RT.REMOTE_OPTION}, blocking=False, context=Context())
                 except Exception as err:  # noqa: BLE001
-                    _LOGGER.warning("Home Rhythm: %s nicht auf externe Temperatur gestellt: %s", sel, err)
+                    _LOGGER.warning("HomeRhythm: %s nicht auf externe Temperatur gestellt: %s", sel, err)
 
     def _observe(self, room_id: str, room: dict[str, Any], now: datetime) -> None:
         reading = self.room_reading(room, now)

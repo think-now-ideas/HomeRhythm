@@ -1,6 +1,6 @@
 {
   "domain": "home_rhythm",
-  "name": "Home Rhythm",
+  "name": "HomeRhythm",
   "after_dependencies": [
     "climate",
     "input_select",
@@ -18,11 +18,11 @@
     "frontend",
     "websocket_api"
   ],
-  "documentation": "https://github.com/think-now-ideas/homeRhythm",
+  "documentation": "https://github.com/think-now-ideas/HomeRhythm",
   "integration_type": "service",
   "iot_class": "calculated",
-  "issue_tracker": "https://github.com/think-now-ideas/homeRhythm/issues",
+  "issue_tracker": "https://github.com/think-now-ideas/HomeRhythm/issues",
   "requirements": [],
   "single_config_entry": true,
-  "version": "0.9.14"
+  "version": "0.9.15"
 }

@@ -19,3 +19,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: home-assistant/actions/hassfest@master
+  # 0.9.15: alle Tests (Integration und Karte im Browser) – fällt z. B. auch auf, wenn Version und CHANGELOG nicht passen.
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Pakete
+        run: |
+          pip install "pytest-homeassistant-custom-component==0.13.316" "home-assistant-frontend==20260128.6" "playwright==1.63.0"
+          python -m playwright install --with-deps chromium
+      - name: Tests
+        run: python -m pytest -q

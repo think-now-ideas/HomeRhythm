@@ -1,7 +1,7 @@
 """Bedienteile (ab 0.9.6, Anlernen ab 0.9.7): Geräte zum Bedienen eines Raums.
 
 Ein Bedienteil ist ein GERÄT (z. B. Aqara W100, SONOFF SNZB-01M, Hue Dimmer). Für jede Funktion (wärmer, kälter,
-zurück zum Plan …) wird einmal die Taste gedrückt; Home Rhythm merkt sich, was das Gerät dabei meldet (die
+zurück zum Plan …) wird einmal die Taste gedrückt; HomeRhythm merkt sich, was das Gerät dabei meldet (die
 „Signatur“), und erkennt genau das wieder:
 
     event:<entität>:<ereignis>    Ereignis-Entität (Zigbee2MQTT 2.x), z. B. single_button_1
@@ -11,12 +11,12 @@ zurück zum Plan …) wird einmal die Taste gedrückt; Home Rhythm merkt sich, w
     plain:<entität>               Tastendruck-Meldung OHNE neuen Wert (W100: PMTSD ohne Anhang = Mitteltaste)
 
 Grundsätze
-- Ein Bedienteil spricht nie direkt mit dem Thermostat: Es löst eine Hand-Änderung des Raums aus, die Home Rhythm
+- Ein Bedienteil spricht nie direkt mit dem Thermostat: Es löst eine Hand-Änderung des Raums aus, die HomeRhythm
   wie gewohnt an das Thermostat gibt (FRITZ!DECT, Better Thermostat, Integration, direkt).
 - Eigene Befehle an das Gerät sind nie ein Tastendruck (eigener Kontext, gleicher Wert kurz danach, Meldung ohne
   Anhang kurz nach einem eigenen Befehl). Werte beim Wiedererreichen des Geräts ebenso nicht.
 - Geräte mit Anzeige (Thermostat-Entität, z. B. W100 im Thermostat-Modus) zeigen den Sollwert des Raums. Nach jedem
-  Tastendruck schreibt Home Rhythm den Wert SOFORT zurück – das W100 aktualisiert sein Display erst dann.
+  Tastendruck schreibt HomeRhythm den Wert SOFORT zurück – das W100 aktualisiert sein Display erst dann.
 """
 
 from __future__ import annotations
@@ -247,7 +247,7 @@ class ControlManager:
                     try:
                         await self._async_show(c["device_id"], c["display"], res.temperature, res.hvac_mode, force)
                     except Exception:  # noqa: BLE001 – eine Anzeige darf die Steuerung nie stören
-                        _LOGGER.exception("Home Rhythm: Bedienteil %s nicht aktualisiert", c["display"])
+                        _LOGGER.exception("HomeRhythm: Bedienteil %s nicht aktualisiert", c["display"])
 
     async def _async_show(self, device_id: str, entity_id: str, temp: float | None, mode: str, force: bool) -> None:
         if entity_id in self._pending:
@@ -366,7 +366,7 @@ class ControlManager:
             if still and self._stamp_confirms(stamp, press):
                 self.hass.async_create_task(self._async_run(press))
             else:
-                _LOGGER.info("Home Rhythm: %s meldet neuen Sollwert ohne Tastendruck – ignoriert", eid)
+                _LOGGER.info("HomeRhythm: %s meldet neuen Sollwert ohne Tastendruck – ignoriert", eid)
                 self.hass.async_create_task(self.async_sync(room_id))
 
         self._pending[eid] = async_call_later(self.hass, PRESS_CONFIRM_DELAY, _confirm)
@@ -376,7 +376,7 @@ class ControlManager:
             name = self._device_name(dev)
             await self.ctrl.runner.async_button(fid, what, name if name.lower().startswith("taster") else f"Taster {name}")
         except Exception:  # noqa: BLE001 – ein Taster darf nichts anderes stören
-            _LOGGER.exception("Home Rhythm: Taster für Zeitplan %s fehlgeschlagen", fid)
+            _LOGGER.exception("HomeRhythm: Taster für Zeitplan %s fehlgeschlagen", fid)
 
     def _stamp_confirms(self, stamp: str, press: dict[str, Any]) -> bool:
         """Aqara W100: „JJJJ-MM-TT hh:mm:ss_MW1_TW20“ – mit Anhang und passendem TW = am Gerät gedrückt."""

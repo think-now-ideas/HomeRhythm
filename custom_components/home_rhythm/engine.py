@@ -1,4 +1,4 @@
-"""Regel-Engine von Home Rhythm (ohne Home-Assistant-Abhängigkeiten, dadurch testbar)."""
+"""Regel-Engine von HomeRhythm (ohne Home-Assistant-Abhängigkeiten, dadurch testbar)."""
 
 from __future__ import annotations
 

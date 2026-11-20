@@ -9,7 +9,7 @@ Begriffe
 - temp_source: device (Fühler am Thermostat) | sensors (Raumsensoren, Durchschnitt) | box (in der Fritz!Box, z. B. 440)
 - correction:  none | fixed | observe
                fixed: c °C wird zum gemessenen Wert addiert gedacht (wie der Versatz in der Fritz!Box):
-                      misst der Fühler 1,5 °C zu viel → c = −1,5 → Home Rhythm schickt Soll − c = Soll + 1,5.
+                      misst der Fühler 1,5 °C zu viel → c = −1,5 → HomeRhythm schickt Soll − c = Soll + 1,5.
                observe: nichts an der Regelung ändern, nur die Abweichung Fühler ↔ Raum messen.
 """
 
@@ -54,6 +54,32 @@ def kind_for(platforms: list[str | None]) -> str:
     if "fritzbox" in platforms:
         return "fritz"
     return "direct"
+
+
+def kind_mismatch(kind: str, platforms: list[str | None]) -> str | None:
+    """Passt die eingestellte Art zu den Thermostaten des Raums? Sonst die passende Art (0.9.15).
+
+    Typischer Fall: ein FRITZ!DECT-Thermostat wurde gegen ein Zigbee-Thermostat getauscht, die Art steht noch auf
+    „FRITZ!DECT“ – dann schickt HomeRhythm keinen Raumwert und das neue Thermostat regelt nach seinem eigenen Fühler.
+    Nur eindeutige Fälle melden; bei gemischten oder unbekannten Geräten lieber schweigen als falsch raten.
+    „andere Regel-Integration“ wird nie beanstandet, solange kein Better/Versatile Thermostat oder FRITZ!DECT dabei
+    ist – dahinter kann jede beliebige Integration stecken.
+    """
+    known = [p for p in platforms if p]
+    if not known or kind not in KINDS:
+        return None
+    if "better_thermostat" in known:
+        want = "bt"
+    elif "versatile_thermostat" in known:
+        want = "integration"
+    elif all(p == "fritzbox" for p in known):
+        want = "fritz"
+    elif "fritzbox" in known:
+        return None  # FRITZ!DECT gemischt mit anderen Geräten: nicht raten
+    else:
+        # Zigbee, Matter, Shelly & Co.: „Thermostat direkt“ – oder eine andere Regel-Integration (dann passt es auch)
+        return "direct" if kind in ("fritz", "bt") else None
+    return want if want != kind else None
 
 
 def normalize(data: dict[str, Any], old: dict[str, Any], kind_default: str) -> dict[str, Any]:

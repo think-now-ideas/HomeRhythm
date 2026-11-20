@@ -1,4 +1,4 @@
-"""Gemeinsame Basis aller Home-Rhythm-Entitäten (ein Gerät „Home Rhythm“, Aktualisierung per Signal)."""
+"""Gemeinsame Basis aller Home-Rhythm-Entitäten (ein Gerät „Home Rhythm“ – Gerätename bleibt, sonst ändern sich die Anzeigenamen aller Entitäten, Aktualisierung per Signal)."""
 
 from __future__ import annotations
 

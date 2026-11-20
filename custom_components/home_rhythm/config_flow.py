@@ -1,4 +1,4 @@
-"""Einrichtung von Home Rhythm über die Oberfläche (Schritt 1 Hausmodi, Schritt 2 Energie)."""
+"""Einrichtung von HomeRhythm über die Oberfläche (Schritt 1 Hausmodi, Schritt 2 Energie)."""
 
 from __future__ import annotations
 
@@ -141,7 +141,7 @@ class HomeRhythmConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_energy(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            return self.async_create_entry(title="Home Rhythm", data={**self._data, **_clean(user_input, ENERGY_ENTITY_KEYS)})
+            return self.async_create_entry(title="HomeRhythm", data={**self._data, **_clean(user_input, ENERGY_ENTITY_KEYS)})
         return self.async_show_form(step_id="energy", data_schema=_energy_schema({}))
 
     @staticmethod

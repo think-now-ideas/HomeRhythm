@@ -822,7 +822,7 @@ def normalize_step(s: Any) -> dict[str, Any]:
         if target != "persistent" and not NOTIFY_RE.match(target):
             raise ValueError("Nachricht: Ziel muss „persistent“ oder ein notify-Dienst sein")
         out["target"] = target
-        out["message"] = _str(s.get("message"), 200) or "Home Rhythm"
+        out["message"] = _str(s.get("message"), 200) or "HomeRhythm"
         if any(tok in out["message"] for tok in ("{{", "{%", "{#")):
             raise ValueError("Nachricht: geschweifte Template-Klammern sind nicht erlaubt")
     return out

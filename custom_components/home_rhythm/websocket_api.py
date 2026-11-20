@@ -22,13 +22,13 @@ from .const import DOMAIN, EVENT_UPDATED, START_TABS
 def _controller(hass: HomeAssistant, connection, msg) -> Any:
     ctrl = hass.data.get(DOMAIN, {}).get("controller")
     if ctrl is None:
-        connection.send_error(msg["id"], "not_loaded", "Home Rhythm ist nicht eingerichtet")
+        connection.send_error(msg["id"], "not_loaded", "HomeRhythm ist nicht eingerichtet")
     return ctrl
 
 
 @callback
 def async_register_websocket(hass: HomeAssistant) -> None:
-    for handler in (ws_state, ws_room_save, ws_room_delete, ws_manual_clear, ws_preview, ws_hint_dismiss, ws_hint_reset, ws_today_set, ws_event_set, ws_season_auto_set, ws_levels_save,
+    for handler in (ws_state, ws_room_save, ws_room_delete, ws_manual_clear, ws_preview, ws_hint_dismiss, ws_room_kind, ws_hint_reset, ws_today_set, ws_event_set, ws_season_auto_set, ws_levels_save,
                     ws_flow_save, ws_flow_delete, ws_flow_order, ws_flow_enabled, ws_flow_apply, ws_flow_skip, ws_flow_test,
                     ws_flow_stop, ws_flow_switch, ws_flow_preview, ws_flow_sim, ws_timeline, ws_at, ws_day_states, ws_export, ws_import, ws_requirement_set, ws_flow_expand, ws_start_tab_set, ws_observe_export, ws_control_learn, ws_room_manual,
                     ws_rooms, ws_subscribe):
@@ -94,6 +94,20 @@ def ws_preview(hass: HomeAssistant, connection, msg) -> None:
 async def ws_hint_dismiss(hass: HomeAssistant, connection, msg) -> None:
     if ctrl := _controller(hass, connection, msg):
         await ctrl.async_dismiss_hint(msg["hint_id"])
+        connection.send_result(msg["id"], {})
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command({vol.Required("type"): "home_rhythm/room/kind", vol.Required("room_id"): str, vol.Required("kind"): str})
+@websocket_api.async_response
+async def ws_room_kind(hass: HomeAssistant, connection, msg) -> None:
+    """0.9.15: Art des Raums umstellen (Knopf am Hinweis „Art passt nicht zu den Thermostaten“)."""
+    if ctrl := _controller(hass, connection, msg):
+        try:
+            await ctrl.async_set_kind(msg["room_id"], msg["kind"])
+        except ValueError as err:
+            connection.send_error(msg["id"], "invalid", str(err))
+            return
         connection.send_result(msg["id"], {})
 
 

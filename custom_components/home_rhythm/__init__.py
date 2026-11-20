@@ -1,4 +1,4 @@
-"""Home Rhythm – Hausmodi, Wochenpläne und Begründungen für Home Assistant."""
+"""HomeRhythm – Hausmodi, Wochenpläne und Begründungen für Home Assistant."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def _register_services(hass: HomeAssistant) -> None:
     def ctrl_and_room(call: ServiceCall) -> tuple[HomeRhythmController, str]:
         ctrl: HomeRhythmController | None = hass.data.get(DOMAIN, {}).get("controller")
         if ctrl is None:
-            raise ServiceValidationError("Home Rhythm ist nicht eingerichtet")
+            raise ServiceValidationError("HomeRhythm ist nicht eingerichtet")
         want = str(call.data["room"]).strip().casefold()
         room_id = next((rid for rid, r in ctrl.rooms.items() if want in (rid.casefold(), str(r.get("name", "")).casefold())), None)
         if room_id is None:
@@ -114,4 +114,4 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     try:
         await native.async_sync(hass, {})
     except Exception as err:  # noqa: BLE001 – Entfernen soll nicht scheitern
-        _LOGGER.warning("Home Rhythm: Automationen in automations.yaml nicht entfernt: %s", err)
+        _LOGGER.warning("HomeRhythm: Automationen in automations.yaml nicht entfernt: %s", err)
