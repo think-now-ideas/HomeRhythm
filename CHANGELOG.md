@@ -1,5 +1,18 @@
 # Änderungen
 
+## 0.9.16 – Thermostat übernimmt nicht
+- **Rotes ⚠ am Raum, wenn ein Thermostat den gesendeten Sollwert nicht übernimmt** – erst nach 5 Minuten
+  (FRITZ!DECT: 20 Minuten, die wachen nur alle paar Minuten auf), sonst ist nichts zu sehen. Typische Ursache ist
+  Funk: Reichweite zum nächsten Zigbee-Router, Batterie, überlastetes Netz. Bisher zeigte die Karte in diesem Fall
+  einfach den Plan-Wert, und man merkte nicht, dass das Gerät weiter mit dem alten Wert heizte.
+- Antippen klappt den Raum auf: „… übernimmt den Sollwert nicht – seit 23:01, 3 Versuche. Gesendet 19,0 °C, das
+  Gerät meldet 21,0 °C.“ Das ⚠ steht in der Heizungsliste, in der Raumkarte und im Raumknopf; die Kopfzeile zählt
+  den Raum unter „auffällig“ (dann rot). Wechselt der Plan, während das Gerät noch nicht reagiert, zählt „seit“ weiter.
+- Einmal pro Vorfall eine Warnung im Home-Assistant-Protokoll, eine Info, sobald das Gerät den Wert übernommen hat.
+- `home_rhythm/rooms` (leichte Raumliste, z. B. für HomeCockpit) liefert dazu `not_taken`.
+- **Raumsymbol zeigt immer den Heizzustand** (🔥 heizt, 💤 Leerlauf, ⏻ aus) – auch bei einer Hand-Änderung. Die Hand
+  steht weiter im Text daneben („Hand ✕“, „✋ bis …“). Bisher verdeckte ✋ das 🔥.
+
 ## 0.9.15 – Grenzen an Sonnenzeiten
 - **„frühestens“ und „spätestens“ an jeder Sonnenzeit** im einfachen Zeitplan – beim Öffnen/Einschalten und beim
   Schließen/Ausschalten, für Rollläden, Licht und Steckdosen und an bestimmten Tagen. Beispiel: „Sonnenuntergang

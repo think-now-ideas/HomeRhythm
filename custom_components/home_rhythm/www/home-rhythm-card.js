@@ -1,6 +1,6 @@
 /* HomeRhythm – Karte für Home Assistant (ohne Build-Schritt, ohne Abhängigkeiten). */
 (() => {
-  const VERSION = "0.9.15";
+  const VERSION = "0.9.16";
   const DAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const DAY_TYPES = [["wd", "Mo–Fr"], ["sa", "Samstag"], ["so", "So / Feiertag"]];
   const COLORS = {
@@ -286,6 +286,9 @@
     .sub2 { font-size:12px; font-weight:400; color:var(--secondary-text-color); }
     .th .off select { padding:2px 4px; font-size:12px; }
     .warnmark { color:var(--warning-color,#ff9800); font-size:14px; }
+    .warnmark.stuck { color:var(--error-color,#db4437); cursor:pointer; }
+    .stuckbox { background:rgba(219,68,55,.08); border-left:3px solid var(--error-color,#db4437); padding:8px 10px; border-radius:6px; font-size:13px; margin:8px 0; }
+    .stuckbox b { color:var(--error-color,#db4437); }
     .foreign { margin:8px 0 10px; font-size:13px; }
     .foreign .fh { font-weight:600; margin-bottom:4px; }
     .hintrow { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:8px; background:rgba(255,152,0,.10); margin-bottom:4px; flex-wrap:wrap; }
@@ -1127,7 +1130,7 @@
       const allDev = rooms.flatMap((r) => (r.devices || []).map((x) => ({ ...x, roomName: r.name }))).concat((d.flow_devices || []).map((x) => ({ ...x, roomName: "" })));
       const seen = new Set(), uniq = allDev.filter((x) => { const k = x.device_id || x.entity_id; if (seen.has(k)) return false; seen.add(k); return true; });
       const low = uniq.filter((x) => x.battery_low), off = uniq.filter((x) => !x.available);
-      const odd = rooms.filter((r) => this._attention(r) && !r.manual);
+      const odd = rooms.filter((r) => this._attention(r) && (!r.manual || this._stuck(r).length));
       const today = d.now.slice(0, 10), yest = isoDate(new Date(Date.parse(today) - 864e5));
       const ferr = ((d.flows && d.flows.items) || []).filter((it) => { const l = (it.log || [])[0]; return l && l.kind === "bad" && l.at.slice(0, 10) >= yest; });
       const use = (x) => (x.uses || []).map((u) => u.text).join(", ") || "nirgends verwendet";
@@ -1144,7 +1147,7 @@
           items: low.map((x) => ({ ico: "🔋", name: x.name, info: `${x.roomName ? x.roomName + " · " : ""}${use(x)}`, val: x.battery != null ? `${fmtNum(x.battery, 0)} %` : "schwach", act: ["more", x.battery_entity || x.entity_id] })) },
         reach: { show: off.length > 0 && this._pref("ovReach", true), label: `📡 ${off.length}`, title: "Geräte nicht erreichbar", cls: "bad", go: ["devgo", "off"], goLabel: "In Geräte zeigen",
           items: off.map((x) => ({ ico: "📡", name: x.name, info: `${x.roomName ? x.roomName + " · " : ""}${use(x)}`, val: x.last_changed ? `seit ${fmtTime(x.last_changed)}` : "", act: ["more", x.entity_id] })) },
-        odd: { show: odd.length > 0 && this._pref("ovOdd", true), label: `⚠ ${odd.length}`, title: "Räume auffällig", cls: "w", go: ["tab", "heat"], goLabel: "Zu „Heizung & Klima“",
+        odd: { show: odd.length > 0 && this._pref("ovOdd", true), label: `⚠ ${odd.length}`, title: "Räume auffällig", cls: odd.some((r) => this._stuck(r).length) ? "bad" : "w", go: ["tab", "heat"], goLabel: "Zu „Heizung & Klima“",
           items: odd.map((r) => ({ ico: "⚠", name: r.name, info: this._attentionWhy(r), val: "", act: ["goroom", r.id] })) },
         ferr: { show: ferr.length > 0, label: `⚠ ${ferr.length} Ablauf`, title: "Abläufe mit Fehler", cls: "bad", go: ["tab", "flows"], goLabel: "Zu „Abläufe“",
           items: ferr.map((it) => ({ ico: it.icon || "⚠", name: it.name, info: it.log[0].text, val: fmtTime(it.log[0].at), act: ["goflow", it.id] })) },
@@ -1155,6 +1158,7 @@
       const c = r.climate || {};
       if (!r.enabled) return "pausiert – HomeRhythm steuert nicht";
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return "Thermostat nicht erreichbar";
+      if (this._stuck(r).length) return this._stuckWhy(r);
       if ((r.hints || []).length) return "wird auch von anderer Stelle gesteuert";
       if (r.kind_hint) return "Art passt nicht zu den Thermostaten";
       const bad = (r.devices || []).filter((x) => x.battery_low || !x.available);
@@ -1237,7 +1241,7 @@
       const ask = this._rcAsk ? this._rcAskHtml() : "";
       const menu = this._ctlMenu === id ? `<div class="ctlmenu rcmenu">${(room.climates || []).map((t) => `<button class="btn sm" data-a="more" data-v="${esc(t.entity_id)}">${esc(t.name)}${t.role === "ac" ? " (Klima)" : ""}</button>`).join("")}</div>` : "";
       const valve = (room.climates || []).filter((x) => x.heat && x.heat.heating != null).map((x) => `${esc(x.name)}: ${x.heat.heating ? "heizt – Ventil auf" : "Ventil zu"}${x.heat.pct != null ? ` · ${x.heat.pct} % der letzten Stunde` : ""}`).join(" · ");
-      const name = `<button class="rcname" data-a="rcopen" title="Raum aufklappen">${esc(this._config.title || room.name)}</button>`;
+      const name = `<button class="rcname" data-a="rcopen" title="Raum aufklappen">${esc(this._config.title || room.name)}${this._stuckMark(room)}</button>`;
       const detail = this._open.has(id) ? `<div class="rcdetail">${this._detailHtml(room)}</div>` : "";
       if (layout === "compact") {
         return `<div class="rc rcc">${icoBtn}<div class="rcmid">${name}<span class="rcline">${line}</span></div>
@@ -1280,7 +1284,7 @@
       const ist = room.room_temp && room.room_temp.value != null ? room.room_temp.value : cl.current_temperature;
       const flags = [
         room.today || room.active_rule ? `<span class="star" title="${esc(room.today ? room.today.label || "heute anders" : room.active_rule)}">★</span>` : "",
-        (room.hints || []).length || room.kind_hint || cl.state === "unavailable" || cl.state === "unknown" || cl.some_unavailable ? `<span class="warnmark" title="${esc(this._attentionWhy(room) || "auffällig")}">⚠</span>` : "",
+        this._stuck(room).length ? this._stuckMark(room).trim() : (room.hints || []).length || room.kind_hint || cl.state === "unavailable" || cl.state === "unknown" || cl.some_unavailable ? `<span class="warnmark" title="${esc(this._attentionWhy(room) || "auffällig")}">⚠</span>` : "",
         (room.devices || []).some((x) => x.battery_low) ? `<span class="batmark" title="Batterie schwach">🔋</span>` : "",
       ].join("");
       const soll = r.hvac_mode === "off" ? "aus" : fmtTemp(r.temperature);
@@ -1372,7 +1376,6 @@
       const r = room.result || {}, c = room.climate || {};
       if (!(room.climates || []).length) return ["🏠", "ohne Heizung"];
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return ["⚠", "Thermostat nicht erreichbar"];
-      if (r.rule === "man" || room.manual) return ["✋", "Hand-Änderung"];
       if ((room.climates || []).some((d) => d.hvac_action === "cooling")) return ["❄️", "kühlt"];
       if (c.state === "off" || r.hvac_mode === "off") return ["⏻", "aus"];
       if (c.hvac_action === "heating") return ["🔥", "heizt"];
@@ -1384,9 +1387,33 @@
       if (!(room.climates || []).length) return (room.devices || []).some((x) => x.battery_low || !x.available);
       if (!room.enabled) return true;
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return true;
+      if (this._stuck(room).length) return true;
       if (r.rule === "man" || room.manual || (room.hints || []).length || room.kind_hint) return true;
       if ((room.devices || []).some((x) => x.battery_low || !x.available)) return true;
       return this._mismatch(room);
+    }
+
+    /** 0.9.16: Thermostate, die einen gesendeten Wert zu lange nicht übernommen haben (meist Funk). */
+    _stuck(room) {
+      return (room.climates || []).filter((t) => t.not_taken);
+    }
+    _stuckWhy(room) {
+      const s = this._stuck(room);
+      if (!s.length) return "";
+      return s.length === 1 ? `${s[0].name} übernimmt den Sollwert nicht (seit ${fmtTime(s[0].not_taken.since)})` : `${s.length} Thermostate übernehmen den Sollwert nicht`;
+    }
+    /** Rotes ⚠ – nur bei diesem Problem; antippen klappt den Raum auf (Zeile) bzw. öffnet ihn. */
+    _stuckMark(room, act) {
+      return this._stuck(room).length ? ` <span class="warnmark stuck" ${act || ""} title="${esc(this._stuckWhy(room))} – antippen für Einzelheiten">⚠</span>` : "";
+    }
+    _stuckHtml(room) {
+      const s = this._stuck(room);
+      if (!s.length) return "";
+      const want = (x) => x.want_hvac === "off" ? "aus" : fmtTemp(x.want_temp);
+      const has = (x) => x.state === "off" ? "aus" : `${x.state === "heat" ? "" : x.state + " / "}${fmtTemp(x.temp)}`;
+      return s.map((t) => `<div class="stuckbox">⚠ <b>${esc(t.name)} übernimmt den Sollwert nicht</b> – seit ${esc(fmtTime(t.not_taken.since))}, ${t.not_taken.tries} ${t.not_taken.tries === 1 ? "Versuch" : "Versuche"}.
+        Gesendet: <b>${esc(want(t.not_taken))}</b>, das Gerät meldet: <b>${esc(has(t.not_taken))}</b>.
+        <br><small>HomeRhythm sendet alle 10 Minuten erneut. Meist ist es ein Funkproblem: Reichweite zum nächsten Zigbee-Router, Batterie, überlastetes Netz. Im Protokoll von Zigbee2MQTT bzw. der Integration steht dann z. B. „timeout“.</small></div>`).join("");
     }
 
     _mismatch(room) {
@@ -1442,7 +1469,7 @@
       return `<div class="room ${open ? "open" : ""}">
         <div class="row" data-a="toggle" data-v="${esc(room.id)}">
           ${noHeat ? `<span class="ico" title="${esc(icoTitle)}">${ico}</span>` : `<button class="ico icob" data-a="ctl" data-v="${esc(room.id)}" title="${esc(icoTitle)} – Thermostat einstellen">${ico}</button>`}
-          <div class="name">${esc(room.name)}${room.today || room.active_rule ? ` <span class="star" title="${esc(room.today ? (room.today.planned ? "Ausnahme geplant" : "Heute anders / Ausnahme") : room.active_rule)}">★</span>` : ""}${(room.hints || []).length ? ` <span class="warnmark" title="Wird auch von anderer Stelle gesteuert">⚠</span>` : ""}${(room.devices || []).some((x) => x.battery_low) ? ` <span class="batmark" title="Batterie schwach">🔋</span>` : ""}${room.humidity && room.humidity.value != null ? `<small class="hum" title="Luftfeuchte">💧 ${fmtNum(room.humidity.value, 0)} %</small>` : ""}</div>
+          <div class="name">${esc(room.name)}${room.today || room.active_rule ? ` <span class="star" title="${esc(room.today ? (room.today.planned ? "Ausnahme geplant" : "Heute anders / Ausnahme") : room.active_rule)}">★</span>` : ""}${this._stuckMark(room) || ((room.hints || []).length ? ` <span class="warnmark" title="Wird auch von anderer Stelle gesteuert">⚠</span>` : "")}${(room.devices || []).some((x) => x.battery_low) ? ` <span class="batmark" title="Batterie schwach">🔋</span>` : ""}${room.humidity && room.humidity.value != null ? `<small class="hum" title="Luftfeuchte">💧 ${fmtNum(room.humidity.value, 0)} %</small>` : ""}</div>
           <div class="num">${fmtTemp(c.current_temperature)}<small>Ist</small></div>
           <div class="num">${noHeat ? "–" : soll}<small>Soll</small></div>
           <div class="why">${noHeat ? "" : `<span class="lvl" style="background:${COLORS[lvl] || "#888"}">${esc(r.level_name || lvl)}${room.manual ? ` <button class="lx" data-a="clear" data-v="${esc(room.id)}" title="Hand-Änderung verwerfen – zurück zum Plan" aria-label="Zurück zum Plan">✕</button>` : ""}</span>`}${room.energy && r.hvac_mode !== "off" && ["plan", "hol", "man", "today", "party", "room"].includes(r.rule) ? `<span class="src ${room.energy.source}" title="${esc(room.energy.reason)}">${room.energy.source === "ac" ? (room.energy.boost ? "Klima + Gas" : "Klima") : "Gas"}</span>` : ""}<span class="txt">${esc(reason)}</span></div>
@@ -1514,7 +1541,8 @@
         ${this._rtHtml(room)}
         ${this._todayHtml(room)}
         ${this._foreignHtml(room)}
-        ${mismatch ? `<div class="warnbox">Das Thermostat steht noch nicht auf dem Sollwert. Funk-Thermostate übernehmen Werte oft erst nach einigen Minuten; HomeRhythm sendet nach 10 Minuten erneut.</div>` : ""}
+        ${this._stuckHtml(room)}
+        ${mismatch && !this._stuck(room).length ? `<div class="warnbox">Das Thermostat steht noch nicht auf dem Sollwert. Funk-Thermostate übernehmen Werte oft erst nach einigen Minuten; HomeRhythm sendet nach 10 Minuten erneut.</div>` : ""}
         <div class="week" id="wk-${esc(room.id)}">${this._previews[room.id] ? this._weekHtml(this._previews[room.id]) : `<span></span><span class="hint">Woche wird geladen …</span>`}</div>
         <div class="histhd"><b>Verlauf</b>${[[24, "24 h"], [72, "3 Tage"], [168, "7 Tage"]].map(([h, n]) => `<button class="seg ${this._histHours === h ? "on" : ""}" data-a="histh" data-v="${h}">${n}</button>`).join("")}</div>
         <div class="hist" data-room="${esc(room.id)}"></div>
@@ -2171,7 +2199,7 @@
         let ico, icoT;
         if (atNow) [ico, icoT] = this._icon(lr);
         else [ico, icoT] = r.manual ? ["✋", "Hand-Änderung"] : off ? ["⏻", "aus"] : r.level === "nacht" ? ["🌙", "Nacht"] : r.level === "absenkung" ? ["💤", "Absenkung"] : r.level === "urlaub" ? ["🧳", "Urlaub"] : ["🔥", "warm (Komfort o. ä.)"];
-        const marks = `${lr.today || lr.active_rule ? ` <span class="star">★</span>` : ""}${(lr.hints || []).length ? ` <span class="warnmark">⚠</span>` : ""}${(lr.devices || []).some((x) => x.battery_low) ? ` <span class="batmark">🔋</span>` : ""}`;
+        const marks = `${lr.today || lr.active_rule ? ` <span class="star">★</span>` : ""}${(atNow && this._stuckMark(lr)) || ((lr.hints || []).length ? ` <span class="warnmark">⚠</span>` : "")}${(lr.devices || []).some((x) => x.battery_low) ? ` <span class="batmark">🔋</span>` : ""}`;
         const next = r.next_at ? ` · bis ${r.next_at.slice(0, 10) !== at.date ? "morgen " : ""}${r.next_at.slice(11, 16)}, dann ${r.next_level_name || ""}${r.next_temp != null ? ` ${fmtNum(r.next_temp)} °C` : ""}` : "";
         const why = atNow && lr.manual ? `✋ von Hand bis ${fmtTime(lr.manual.until)}` : `${r.reason || ""}${next}`;
         const lvl = off ? "aus" : r.level;

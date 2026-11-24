@@ -57,6 +57,8 @@ from .const import (
     GRACE_SECONDS,
     RESYNC_SECONDS,
     SLOW_ECHO_SECONDS,
+    STUCK_SECONDS,
+    STUCK_SECONDS_SLOW,
     START_TABS,
     MAX_EXCEPTION_DAYS,
     SIGNAL_UPDATED,
@@ -996,22 +998,84 @@ class HomeRhythmController:
             return
         if last and last["want"] == want:
             if self._matches(state, want):
+                self._clear_stuck(key, entity_id)
                 return
             if (now - last["at"]).total_seconds() < RESYNC_SECONDS:
+                self._check_stuck(room_id, key, entity_id)
                 return  # Gerät hat den Befehl evtl. noch nicht übernommen (träge Funkgeräte)
         elif self._matches(state, want):
+            self._clear_stuck(key, entity_id)
             self._last_sent[key] = {"want": want, "at": now, "rule": result.rule}
             return
         await self._async_send(key, entity_id, state, want, result.rule)
+        self._check_stuck(room_id, key, entity_id)
+
+    # ------------------------------------------------------------------ Übernimmt nicht (0.9.16)
+    def _stuck_limit(self, room_id: str) -> int:
+        room = self.rooms.get(room_id) or {}
+        return STUCK_SECONDS_SLOW if room.get("kind") == "fritz" else STUCK_SECONDS
+
+    def stuck_info(self, room_id: str, entity_id: str) -> dict[str, Any] | None:
+        """Hat das Thermostat einen gesendeten Wert noch nicht übernommen – und zwar schon zu lange?
+
+        Nur Anzeige: erst nach STUCK_SECONDS (FRITZ!DECT: STUCK_SECONDS_SLOW), damit normale Funk-Verzögerungen
+        kein Warnzeichen auslösen. Nicht erreichbare Geräte zeigt die Karte ohnehin als „nicht erreichbar“.
+        """
+        last = self._last_sent.get(f"{room_id}|{entity_id}")
+        if not last or not last.get("since"):
+            return None
+        state = self.hass.states.get(entity_id)
+        if state is None or state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            return None
+        if (dt_util.utcnow() - last["since"]).total_seconds() < self._stuck_limit(room_id):
+            return None
+        want = last["want"]
+        return {
+            "since": last["since"].isoformat(),
+            "tries": int(last.get("tries") or 1),
+            "want_hvac": want.get("hvac"),
+            "want_temp": want.get("temp"),
+            "state": state.state,
+            "temp": state.attributes.get(ATTR_TEMPERATURE),
+        }
+
+    def _check_stuck(self, room_id: str, key: str, entity_id: str) -> None:
+        """Einmal pro Vorfall ins HA-Protokoll schreiben, sobald die Karte das rote ⚠ zeigt."""
+        last = self._last_sent.get(key)
+        if not last or last.get("warned") or not (info := self.stuck_info(room_id, entity_id)):
+            return
+        last["warned"] = True
+        _LOGGER.warning(
+            "HomeRhythm: %s übernimmt den Sollwert nicht – seit %s, %s (gesendet %s %s, Gerät meldet %s %s). "
+            "Meist ein Funkproblem (Reichweite, Batterie, Zigbee-Netz).",
+            entity_id, dt_util.as_local(last["since"]).strftime("%H:%M"),
+            "1 Versuch" if info["tries"] == 1 else f"{info['tries']} Versuche",
+            info["want_hvac"], info["want_temp"], info["state"], info["temp"],
+        )
+
+    def _clear_stuck(self, key: str, entity_id: str) -> None:
+        last = self._last_sent.get(key)
+        if not last or not last.get("since"):
+            return
+        if last.get("warned"):
+            _LOGGER.info("HomeRhythm: %s hat den Sollwert jetzt übernommen", entity_id)
+        for k in ("since", "tries", "warned"):
+            last.pop(k, None)
 
     async def _async_send(self, key: str, entity_id: str, state, want: dict[str, Any], rule: str | None = None) -> None:
         ctx = Context()
         self._own_contexts.append(ctx.id)
+        before = self._last_sent.get(key) or {}
         self._last_sent[key] = {
             "want": want,
             "at": dt_util.utcnow(),
             "rule": rule,
             "prev": (state.state, state.attributes.get(ATTR_TEMPERATURE)),  # alter Wert – träge Geräte melden ihn evtl. noch einmal
+            # 0.9.16: seit wann ein gesendeter Wert nicht übernommen ist und wie oft gesendet wurde. Wechselt der Plan,
+            # während das Gerät noch nicht reagiert, zählt das weiter (es ist dasselbe Problem).
+            "since": before.get("since") or dt_util.utcnow(),
+            "tries": int(before.get("tries") or 0) + 1,
+            "warned": before.get("warned", False),
         }
         hvac_modes = state.attributes.get("hvac_modes") or []
         try:
@@ -1975,6 +2039,8 @@ class HomeRhythmController:
                 "level_name": res.get("level_name"),
                 "manual_until": m.until.isoformat() if m else None,
                 "unavailable": bool(bad) and bool(ents),
+                # 0.9.16: ein Thermostat übernimmt den gesendeten Sollwert seit Minuten nicht (z. B. Funkproblem)
+                "not_taken": any(self.stuck_info(room_id, e) for e in ents),
             })
         return out
 
@@ -2001,6 +2067,7 @@ class HomeRhythmController:
                         "role": "ac" if eid in acs else "radiator",
                         "result": self._res(self.dev_results.get(f"{room_id}|{eid}")),
                         "heat": None if (g := self.gone(eid)) else self.heat_info(eid),
+                        "not_taken": self.stuck_info(room_id, eid),
                         "gone": g,
                     }
                 )

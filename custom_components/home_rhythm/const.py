@@ -1,7 +1,7 @@
 """Konstanten für HomeRhythm."""
 
 DOMAIN = "home_rhythm"
-VERSION = "0.9.15"
+VERSION = "0.9.16"
 
 CONF_SEASON_ENTITY = "season_entity"
 CONF_WINTER_VALUES = "winter_values"
@@ -72,6 +72,10 @@ RESYNC_SECONDS = 600
 # übernimmt Befehle teils erst beim nächsten Aufwachen, bis ca. 15 min).
 SLOW_ECHO_SECONDS = 900
 TICK_SECONDS = 60
+# 0.9.16: Übernimmt ein Thermostat einen gesendeten Wert so lange nicht, zeigt die Karte ein rotes ⚠
+# (meist ein Funkproblem). FRITZ!DECT wacht nur alle paar Minuten auf und bekommt deshalb mehr Zeit.
+STUCK_SECONDS = 300
+STUCK_SECONDS_SLOW = 1200
 
 # Reiter, mit denen die Karte öffnen kann
 START_TABS = ("overview", "heat", "flows", "devices", "setup")
