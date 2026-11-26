@@ -105,6 +105,7 @@ Später änderst du alles unter **Einstellungen → Geräte & Dienste → HomeRh
 | **Heizung & Klima** | Räume nach Etagen: Ist, Soll, Stufe, Grund, „bis wann“. Aufgeklappt: Geräte, „Heute anders“, Woche, Verlauf, fremde Steuerung. Das Symbol vorne öffnet das **Bedien-Fenster** (Temperatur, Stufe, „gilt bis“, Zurück zum Plan, Links „Gerät ⤴“ zum HA-Dialog). |
 | **Abläufe** | Zeitpläne (Rollläden, Licht & Steckdosen) und Reaktionen. Jeder Ablauf zeigt Zustand, nächsten Schaltpunkt und den heutigen Verlauf; aufgeklappt Woche, Protokoll und Aktionen. Das Symbol vorne öffnet das Bedien-Fenster (alle oder einzelne Geräte schalten, nächsten Schaltpunkt überspringen). „Was wäre wenn“ steht in der Übersicht unter 🕐 Vorschau. |
 | **Geräte** | Batterie und Erreichbarkeit – Filter „Batterie schwach“ und „Nicht erreichbar“. |
+| **Funk** | (ab 0.9.17) Je Thermostat: wie viele Befehle von HomeRhythm rechtzeitig ankamen, Raumwerte, längste Verzögerung, „nicht erreichbar“, zuletzt gemeldet – 24 h und 7 Tage. Auffällige Thermostate bekommen am Raum ein gelbes ⚠. „Zählung neu beginnen“ (z. B. nach einem Umbau des Zigbee-Netzes) für Administratoren. |
 | **Einrichtung** | Räume, Stufen, Hausmodi/Energie (öffnet HA), Sicherung (Export/Import). Nur für Administratoren. |
 
 ---
@@ -362,6 +363,7 @@ Erst wenn alle Räume und Abläufe angelegt sind:
 - **Gespeichert** wird in `/config/.storage/home_rhythm.data`: Räume, Stufen, Abläufe, laufende Hand-Änderungen, die
   letzten fremden Änderungen je Thermostat (mit Name und ID des HA-Benutzers bzw. der Automation, die geändert hat) und
   ein kurzes Protokoll je Ablauf (höchstens 30 Einträge). Tagesmittel der Außentemperatur für die Jahreszeit-Automatik.
+  Ab 0.9.17 eine Funk-Zählung je Thermostat (nur Zeiten und Anzahlen, je Stunde, 7 Tage).
 - **Beim Löschen der Integration** werden diese Daten und alle von HomeRhythm angelegten Automationen entfernt.
 - **Sicherung (Export)** enthält nur die Einrichtung – keine Protokolle, Hand-Änderungen oder Benutzernamen. Die Datei
   enthält aber die Namen deiner Geräte und Räume; teile sie entsprechend vorsichtig.
@@ -388,6 +390,9 @@ Sicherheitslücke gefunden? Bitte nicht als öffentliches Issue, sondern über �
 - **„Hand-Änderung“, die keine war:** Funk-Thermostate übernehmen Werte oft erst nach Minuten. HomeRhythm wartet
   3 Minuten und sendet nach 10 Minuten erneut. Unter „Zuletzt von außen geändert“ steht, wer geändert hat.
   ✕ am Schild setzt zurück.
+- **Thermostat reagiert schlecht / gelbes ⚠ am Raum:** Reiter „Funk“ zeigt, welche Befehle zu spät oder nicht
+  ankamen. Meist ist es Funk: Reichweite zum nächsten Zigbee-Router (Gerät mit Netzstrom), Batterie, überlastetes Netz.
+  Gezählt wird nur, was HomeRhythm selbst sendet.
 - **Ein Ablauf schaltet nicht:** Protokoll im aufgeklappten Ablauf ansehen; Bedingung erfüllt? Geräte erreichbar?
   Hausmodi-Helfer verfügbar? (Ist einer „nicht verfügbar“, schaltet HomeRhythm sicherheitshalber nichts.)
 - **Protokoll für Entwickler:** in `configuration.yaml`

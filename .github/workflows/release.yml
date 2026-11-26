@@ -35,4 +35,4 @@ jobs:
         run: |
           if gh release view "v$VERSION" >/dev/null 2>&1; then echo "v$VERSION gibt es schon"; exit 0; fi
           NOTES=$(awk -v v="$VERSION" '$0 ~ "^## " && ($2 == v) {f=1; next} /^## / && f {exit} f' CHANGELOG.md)
-          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "Home Rhythm $VERSION" --notes "${NOTES:-Siehe CHANGELOG.md}"
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "HomeRhythm $VERSION" --notes "${NOTES:-Siehe CHANGELOG.md}"

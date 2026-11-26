@@ -31,7 +31,7 @@ def async_register_websocket(hass: HomeAssistant) -> None:
     for handler in (ws_state, ws_room_save, ws_room_delete, ws_manual_clear, ws_preview, ws_hint_dismiss, ws_room_kind, ws_hint_reset, ws_today_set, ws_event_set, ws_season_auto_set, ws_levels_save,
                     ws_flow_save, ws_flow_delete, ws_flow_order, ws_flow_enabled, ws_flow_apply, ws_flow_skip, ws_flow_test,
                     ws_flow_stop, ws_flow_switch, ws_flow_preview, ws_flow_sim, ws_timeline, ws_at, ws_day_states, ws_export, ws_import, ws_requirement_set, ws_flow_expand, ws_start_tab_set, ws_observe_export, ws_control_learn, ws_room_manual,
-                    ws_rooms, ws_subscribe):
+                    ws_rooms, ws_subscribe, ws_radio_reset):
         websocket_api.async_register_command(hass, handler)
 
 
@@ -509,3 +509,15 @@ def ws_subscribe(hass: HomeAssistant, connection, msg) -> None:
 
     connection.subscriptions[msg["id"]] = hass.bus.async_listen(EVENT_UPDATED, forward)
     connection.send_result(msg["id"])
+
+
+# 0.9.17: Funk-Zählung neu beginnen (z. B. nach Wechsel des Zigbee-Sticks) bzw. wieder alles zeigen.
+# Ändert nur die Anzeige, nicht die Steuerung – trotzdem nur für Administratoren (betrifft alle Nutzer).
+@websocket_api.require_admin
+@websocket_api.websocket_command({vol.Required("type"): "home_rhythm/radio/reset", vol.Required("on"): bool})
+@websocket_api.async_response
+async def ws_radio_reset(hass: HomeAssistant, connection, msg) -> None:
+    if not (ctrl := _controller(hass, connection, msg)):
+        return
+    await ctrl.async_radio_reset(msg["on"])
+    connection.send_result(msg["id"], {"reset_at": ctrl.radio.reset_at.isoformat() if ctrl.radio.reset_at else None})

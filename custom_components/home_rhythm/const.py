@@ -1,7 +1,7 @@
 """Konstanten für HomeRhythm."""
 
 DOMAIN = "home_rhythm"
-VERSION = "0.9.16"
+VERSION = "0.9.17"
 
 CONF_SEASON_ENTITY = "season_entity"
 CONF_WINTER_VALUES = "winter_values"
@@ -76,8 +76,10 @@ TICK_SECONDS = 60
 # (meist ein Funkproblem). FRITZ!DECT wacht nur alle paar Minuten auf und bekommt deshalb mehr Zeit.
 STUCK_SECONDS = 300
 STUCK_SECONDS_SLOW = 1200
+# 0.9.17: nach dem Start von HA so lange „nicht erreichbar“ nicht als Funkproblem zählen (alle Geräte kommen erst)
+STARTUP_GRACE_SECONDS = 300
 
 # Reiter, mit denen die Karte öffnen kann
-START_TABS = ("overview", "heat", "flows", "devices", "setup")
+START_TABS = ("overview", "heat", "flows", "devices", "radio", "setup")
 # Ausnahme („Heute“) höchstens so weit im Voraus
 MAX_EXCEPTION_DAYS = 14

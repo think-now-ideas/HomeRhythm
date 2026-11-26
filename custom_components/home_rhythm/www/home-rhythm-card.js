@@ -1,6 +1,6 @@
 /* HomeRhythm – Karte für Home Assistant (ohne Build-Schritt, ohne Abhängigkeiten). */
 (() => {
-  const VERSION = "0.9.16";
+  const VERSION = "0.9.17";
   const DAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const DAY_TYPES = [["wd", "Mo–Fr"], ["sa", "Samstag"], ["so", "So / Feiertag"]];
   const COLORS = {
@@ -730,6 +730,51 @@
       .dlg { border-radius:0; max-height:100vh; height:100vh; }
       .blk { grid-template-columns:64px auto 64px minmax(0,1fr) 28px; gap:4px; }
     }
+    /* 0.9.17 Funk-Zuverlässigkeit */
+    .warnmark.radio { cursor:pointer; }
+    .hcnt.okc { background:#e3f1e6; color:#1e5b2b; }
+    .rlink { border:0; background:none; font:inherit; font-size:12px; padding:2px 4px; margin-left:4px; cursor:pointer; color:var(--secondary-text-color); white-space:nowrap; border-radius:6px; }
+    .rlink:hover { background:var(--secondary-background-color,#f2f4f6); }
+    .rlink.y { color:#8a5a00; } .rlink.r { color:var(--error-color,#db4437); }
+    .rdot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--success-color,#43a047); vertical-align:-1px; }
+    .rdot.y { background:var(--warning-color,#ffa600); } .rdot.r { background:var(--error-color,#db4437); } .rdot.n { background:var(--disabled-text-color,#9aa0a6); }
+    .rdtab { padding:12px 14px; }
+    .rdhead { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; } .rdhead .sp { flex:1; }
+    .rdask { display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:13px; }
+    .rdscroll { overflow-x:auto; }
+    .rdt { width:100%; border-collapse:collapse; font-size:14px; }
+    .rdt th, .rdt td { padding:9px 6px; border-bottom:1px solid var(--divider-color); text-align:left; vertical-align:middle; }
+    .rdt th { font-weight:500; color:var(--secondary-text-color); font-size:12.5px; }
+    .rdt td small { display:block; color:var(--secondary-text-color); font-size:12px; }
+    .rdt .n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .rdt tbody tr { cursor:pointer; } .rdt tbody tr:hover { background:var(--secondary-background-color,#f5f6f7); }
+    @media (max-width:600px) { .rdt .w { display:none; } }
+    .rddlg { width:min(600px,100%); }
+    .rdbody { padding:14px 18px; display:flex; flex-direction:column; gap:12px; }
+    .rdsh { display:flex; align-items:center; gap:10px; flex-wrap:wrap; } .rdsh h3 { margin:0; font-size:15px; font-weight:500; flex:1; }
+    .rdverdict { display:flex; gap:10px; align-items:center; font-size:15.5px; font-weight:500; }
+    .rdkv { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; }
+    .rdkv > div { background:var(--secondary-background-color,#f4f6f8); border-radius:10px; padding:8px 10px; }
+    .rdkv small { display:block; color:var(--secondary-text-color); font-size:12px; }
+    .rdkv b { font-weight:500; font-size:16px; font-variant-numeric:tabular-nums; }
+    .rdkv .y { background:rgba(255,166,0,.16); } .rdkv .r { background:rgba(219,68,55,.12); }
+    .rdband { position:relative; height:22px; border-radius:6px; overflow:hidden; background:var(--success-color,#43a047); }
+    .rdband i { position:absolute; top:0; bottom:0; min-width:3px; }
+    .rdax { display:flex; justify-content:space-between; font-size:12px; color:var(--secondary-text-color); margin-top:3px; }
+    .rdlegend { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--secondary-text-color); }
+    .rdlegend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+    .rddays { display:grid; gap:5px; }
+    .rdday { display:grid; grid-template-columns:44px minmax(0,1fr) 64px; gap:8px; align-items:center; font-size:13px; }
+    .rdbar { height:12px; border-radius:6px; background:var(--secondary-background-color,#eef0f2); overflow:hidden; }
+    .rdbar i { display:block; height:100%; background:var(--success-color,#43a047); }
+    .rdbar i.y { background:var(--warning-color,#ffa600); } .rdbar i.r { background:var(--error-color,#db4437); }
+    .rdev { display:grid; margin-left:4px; }
+    .rdev div { border-left:2px solid var(--divider-color); padding:0 0 9px 14px; position:relative; font-size:13px; }
+    .rdev div::before { content:""; position:absolute; left:-6px; top:5px; width:10px; height:10px; border-radius:50%; background:var(--success-color,#43a047); }
+    .rdev div.y::before { background:var(--warning-color,#ffa600); } .rdev div.r::before { background:var(--error-color,#db4437); } .rdev div.o::before { background:var(--disabled-text-color,#9aa0a6); }
+    .rdev small { color:var(--secondary-text-color); margin-right:6px; font-variant-numeric:tabular-nums; }
+    .rdwhy { border-radius:10px; padding:8px 10px; font-size:13px; background:var(--secondary-background-color,#f4f6f8); }
+    .rdwhy.y { background:rgba(255,166,0,.16); } .rdwhy.r { background:rgba(219,68,55,.12); }
   `;
 
 
@@ -861,7 +906,7 @@
     async _init() {
       // 0.9.13: Fenster als <dialog> mit showModal() – liegen im „Top Layer“ des Browsers, also sicher über der
       // HA-Kopfleiste und werden von Abschnitten / Bearbeiten-Modus (transform, overflow) nicht abgeschnitten.
-      this.shadowRoot.innerHTML = `<style>${STYLE}</style><ha-card><div class="wrap" id="main"></div></ha-card><dialog id="dlg" class="hrdlg"></dialog><dialog id="tdlg" class="hrdlg"></dialog><dialog id="qdlg" class="hrdlg"></dialog>`;
+      this.shadowRoot.innerHTML = `<style>${STYLE}</style><ha-card><div class="wrap" id="main"></div></ha-card><dialog id="dlg" class="hrdlg"></dialog><dialog id="tdlg" class="hrdlg"></dialog><dialog id="qdlg" class="hrdlg"></dialog><dialog id="fdlg" class="hrdlg"></dialog>`;
       this._watchDialogs();
       this.shadowRoot.addEventListener("click", (e) => this._onClick(e));
       this.shadowRoot.addEventListener("change", (e) => this._onChange(e));
@@ -938,6 +983,7 @@
         for (const k of Object.keys(this._tlCache)) if (k.startsWith(this._data.now.slice(0, 10))) delete this._tlCache[k];  // „Heute“ neu laden (Erledigtes, laufende Reaktionen)
         this._dayCache = {};  // Stand je Viertelstunde neu (Hand-Änderungen, Pläne)
         if (this._q) this._renderQ();
+        if (this._rdlg) this._renderRadio();
         if (this._sim) this._loadSim();
         for (const id of this._open) this._loadPreview(id);
         if (this._rid && this._config.layout === "tablet" && Date.now() - (this._rcPrevAt || 0) > 600000) { this._rcPrevAt = Date.now(); this._loadPreview(this._rid).then(() => this._render()); }
@@ -1073,10 +1119,10 @@
         main.innerHTML = this._knopf ? this._knopfHtml() : this._roomCardHtml();
         return;
       }
-      const tabs = [["overview", "Übersicht", "Übersicht"], ["heat", "Heizung & Klima", "Heizung"], ["flows", "Abläufe", "Abläufe"], ["devices", "Geräte", "Geräte"], ["setup", "Einrichtung", "Setup"]];
+      const tabs = [["overview", "Übersicht", "Übersicht"], ["heat", "Heizung & Klima", "Heizung"], ["flows", "Abläufe", "Abläufe"], ["devices", "Geräte", "Geräte"], ["radio", "Funk", "Funk"], ["setup", "Einrichtung", "Setup"]];
       const views = { overview: () => this._reqBanner() + this._headerHtml()
           + `<div class="ovgrid"><div class="ovleft" id="ovleft">${this._ovStateHtml()}</div><div class="ovright" id="ovright">${this._timelineHtml()}</div></div>`, heat: () => this._overviewHtml(),
-        flows: () => this._flowsHtml(), devices: () => this._devicesHtml(), setup: () => this._setupHtml() };
+        flows: () => this._flowsHtml(), devices: () => this._devicesHtml(), radio: () => this._radioTabHtml(), setup: () => this._setupHtml() };
       main.innerHTML = `
         <div class="top">
           <div class="title">${this._config.title ? `${LOGO}${esc(this._config.title)}` : WORDMARK}
@@ -1110,7 +1156,8 @@
       const gear = this._ovGear ? `<div class="ovsub"><b class="hint">Hinweise oben zeigen</b>
           <label><input type="checkbox" data-a="ovopt" data-k="ovBatt" ${this._pref("ovBatt", true) ? "checked" : ""}> 🔋 Batterie</label>
           <label><input type="checkbox" data-a="ovopt" data-k="ovReach" ${this._pref("ovReach", true) ? "checked" : ""}> 📡 Erreichbarkeit</label>
-          <label><input type="checkbox" data-a="ovopt" data-k="ovOdd" ${this._pref("ovOdd", true) ? "checked" : ""}> ⚠ auffällige Räume</label></div>` : "";
+          <label><input type="checkbox" data-a="ovopt" data-k="ovOdd" ${this._pref("ovOdd", true) ? "checked" : ""}> ⚠ auffällige Räume</label>
+          <label><input type="checkbox" data-a="ovopt" data-k="ovRadio" ${this._pref("ovRadio", true) ? "checked" : ""}> 📶 Funk</label></div>` : "";
       return `<div class="tile ovhead"><div class="ovhrow">
           <span class="hico2">${icon}</span><span class="htx"><b>${esc(title)}</b><small>${esc(sub)}</small></span>
           <span class="hpills">${modeChips.map((c) => `<span>${esc(c)}</span>`).join("")}<button class="mini ${this._modesOpen ? "on" : ""}" data-a="modes">${this._modesOpen ? "weniger ⌃" : "mehr ⌄"}</button></span>
@@ -1134,6 +1181,7 @@
       const today = d.now.slice(0, 10), yest = isoDate(new Date(Date.parse(today) - 864e5));
       const ferr = ((d.flows && d.flows.items) || []).filter((it) => { const l = (it.log || [])[0]; return l && l.kind === "bad" && l.at.slice(0, 10) >= yest; });
       const use = (x) => (x.uses || []).map((u) => u.text).join(", ") || "nirgends verwendet";
+      const rall = this._radioAll(), rbad = rall.filter((x) => x.t.radio.level);  // 0.9.17 Funk
       return {
         heat: { show: true, label: `🔥 ${heating.length}/${heatRooms.length}`, title: "Räume heizen gerade", go: ["tab", "heat"], goLabel: "Zu „Heizung & Klima“",
           items: heating.map((r) => ({ ico: "🔥", name: r.name, info: `${(r.result || {}).level_name || ""} ${fmtTemp((r.result || {}).temperature)}`, val: `Ist ${fmtTemp((r.climate || {}).current_temperature)}`, act: ["goroom", r.id] })) },
@@ -1149,6 +1197,9 @@
           items: off.map((x) => ({ ico: "📡", name: x.name, info: `${x.roomName ? x.roomName + " · " : ""}${use(x)}`, val: x.last_changed ? `seit ${fmtTime(x.last_changed)}` : "", act: ["more", x.entity_id] })) },
         odd: { show: odd.length > 0 && this._pref("ovOdd", true), label: `⚠ ${odd.length}`, title: "Räume auffällig", cls: odd.some((r) => this._stuck(r).length) ? "bad" : "w", go: ["tab", "heat"], goLabel: "Zu „Heizung & Klima“",
           items: odd.map((r) => ({ ico: "⚠", name: r.name, info: this._attentionWhy(r), val: "", act: ["goroom", r.id] })) },
+        radio: { show: rall.length > 0 && this._pref("ovRadio", true), label: `📶 ${rall.length - rbad.length}/${rall.length}`, title: rbad.length ? "Thermostate mit auffälligem Funk (24 h)" : "Funk: alle Thermostate zuverlässig (24 h)",
+          cls: rbad.some((x) => x.t.radio.level === "r") ? "bad" : rbad.length ? "w" : "okc", go: ["tab", "radio"], goLabel: "Zur Liste „Funk“",
+          items: rbad.map(({ t, room }) => ({ ico: "⚠", name: `${room.name} · ${t.name}`, info: (t.radio.why || [])[0] || this._radioWord(t.radio), val: "", act: ["radio", t.entity_id] })) },
         ferr: { show: ferr.length > 0, label: `⚠ ${ferr.length} Ablauf`, title: "Abläufe mit Fehler", cls: "bad", go: ["tab", "flows"], goLabel: "Zu „Abläufe“",
           items: ferr.map((it) => ({ ico: it.icon || "⚠", name: it.name, info: it.log[0].text, val: fmtTime(it.log[0].at), act: ["goflow", it.id] })) },
       };
@@ -1159,6 +1210,7 @@
       if (!r.enabled) return "pausiert – HomeRhythm steuert nicht";
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return "Thermostat nicht erreichbar";
       if (this._stuck(r).length) return this._stuckWhy(r);
+      if (this._radioYellow(r).length) { const y = this._radioYellow(r)[0]; return `Funk auffällig: ${y.name} – ${(y.radio.why || [])[0] || ""}`; }
       if ((r.hints || []).length) return "wird auch von anderer Stelle gesteuert";
       if (r.kind_hint) return "Art passt nicht zu den Thermostaten";
       const bad = (r.devices || []).filter((x) => x.battery_low || !x.available);
@@ -1284,7 +1336,7 @@
       const ist = room.room_temp && room.room_temp.value != null ? room.room_temp.value : cl.current_temperature;
       const flags = [
         room.today || room.active_rule ? `<span class="star" title="${esc(room.today ? room.today.label || "heute anders" : room.active_rule)}">★</span>` : "",
-        this._stuck(room).length ? this._stuckMark(room).trim() : (room.hints || []).length || room.kind_hint || cl.state === "unavailable" || cl.state === "unknown" || cl.some_unavailable ? `<span class="warnmark" title="${esc(this._attentionWhy(room) || "auffällig")}">⚠</span>` : "",
+        this._stuck(room).length ? this._stuckMark(room).trim() : this._radioYellow(room).length ? this._radioMark(room).trim() : (room.hints || []).length || room.kind_hint || cl.state === "unavailable" || cl.state === "unknown" || cl.some_unavailable ? `<span class="warnmark" title="${esc(this._attentionWhy(room) || "auffällig")}">⚠</span>` : "",
         (room.devices || []).some((x) => x.battery_low) ? `<span class="batmark" title="Batterie schwach">🔋</span>` : "",
       ].join("");
       const soll = r.hvac_mode === "off" ? "aus" : fmtTemp(r.temperature);
@@ -1387,7 +1439,7 @@
       if (!(room.climates || []).length) return (room.devices || []).some((x) => x.battery_low || !x.available);
       if (!room.enabled) return true;
       if (c.state === "unavailable" || c.state === "unknown" || c.some_unavailable) return true;
-      if (this._stuck(room).length) return true;
+      if (this._stuck(room).length || this._radioYellow(room).length) return true;
       if (r.rule === "man" || room.manual || (room.hints || []).length || room.kind_hint) return true;
       if ((room.devices || []).some((x) => x.battery_low || !x.available)) return true;
       return this._mismatch(room);
@@ -1414,6 +1466,132 @@
       return s.map((t) => `<div class="stuckbox">⚠ <b>${esc(t.name)} übernimmt den Sollwert nicht</b> – seit ${esc(fmtTime(t.not_taken.since))}, ${t.not_taken.tries} ${t.not_taken.tries === 1 ? "Versuch" : "Versuche"}.
         Gesendet: <b>${esc(want(t.not_taken))}</b>, das Gerät meldet: <b>${esc(has(t.not_taken))}</b>.
         <br><small>HomeRhythm sendet alle 10 Minuten erneut. Meist ist es ein Funkproblem: Reichweite zum nächsten Zigbee-Router, Batterie, überlastetes Netz. Im Protokoll von Zigbee2MQTT bzw. der Integration steht dann z. B. „timeout“.</small></div>`).join("");
+    }
+
+    // ------------------------------------------------------------ 0.9.17 Funk-Zuverlässigkeit
+    /** Alle Thermostate mit Funk-Zählung als [{ t, room }] – rot, dann gelb, dann ok. */
+    _radioAll() {
+      const out = [];
+      for (const room of (this._data && this._data.rooms) || []) for (const t of room.climates || []) if (t.radio) out.push({ t, room });
+      const rank = (x) => ({ r: 0, y: 1 })[x.t.radio.level] ?? 2;
+      return out.sort((a, b) => rank(a) - rank(b) || String(a.room.name).localeCompare(String(b.room.name), "de"));
+    }
+    /** Thermostate mit gelbem Funk-Zeichen (rot zeigt weiter das ⚠ „übernimmt nicht“ aus 0.9.16). */
+    _radioYellow(room) { return (room.climates || []).filter((t) => t.radio && t.radio.level === "y" && !t.not_taken); }
+    _radioMark(room) {
+      const y = this._radioYellow(room);
+      if (!y.length) return "";
+      const why = `Funk auffällig (24 h): ${y[0].name} – ${(y[0].radio.why || [])[0] || ""}`;
+      return ` <span class="warnmark radio" role="button" tabindex="0" data-a="radio" data-v="${esc(y[0].entity_id)}" title="${esc(why)} – antippen für Einzelheiten">⚠</span>`;
+    }
+    _radioWord(r) {
+      if (!r) return "";
+      if (r.level === "r") return "hängt";
+      if (r.level === "y") return "Funk auffällig";
+      return r.cmd_total || r.rv_total || r.off_count ? "Funk ok" : "Funk: noch keine Daten";
+    }
+    _radioLink(t) {
+      return t.radio ? ` <button class="rlink ${t.radio.level || ""}" data-a="radio" data-v="${esc(t.entity_id)}" title="Funk-Zuverlässigkeit dieses Thermostats">📶 ${esc(this._radioWord(t.radio))} ›</button>` : "";
+    }
+    _rdMins(sec) { return sec == null ? "–" : sec < 60 ? "unter 1 Min." : sec < 5400 ? `${Math.round(sec / 60)} Min.` : `${fmtNum(sec / 3600, 1)} Std.`; }
+    _rdAgo(iso) {
+      if (!iso) return "–";
+      const now = NOW_REF ? Date.parse(NOW_REF) : Date.now(), s = Math.max(0, (now - Date.parse(iso)) / 1000);
+      return s < 90 ? "gerade eben" : s < 5400 ? `vor ${Math.round(s / 60)} Min.` : s < 172800 ? `vor ${Math.round(s / 3600)} Std.` : `vor ${Math.round(s / 86400)} Tagen`;
+    }
+    _rdClock(iso) {
+      const d = new Date(iso), now = NOW_REF ? new Date(NOW_REF) : new Date();
+      const hm = d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+      return d.toDateString() === now.toDateString() ? hm : `${d.toLocaleDateString("de-DE", { weekday: "short" })} ${hm}`;
+    }
+    _rdShare(r) { return r.rv_total ? Math.round((r.rv_ok / r.rv_total) * 100) : null; }
+
+    /** Reiter „Funk“: alle Thermostate, schlechteste oben. */
+    _radioTabHtml() {
+      const all = this._radioAll(), d = this._data;
+      if (!all.length) return `<div class="tile rdtab"><span class="hint">Noch keine Thermostate in HomeRhythm.</span></div>`;
+      const since = d.radio_reset ? `gezählt seit ${this._rdClock(d.radio_reset)}` : "letzte 24 h";
+      const reset = !this._admin ? "" : this._rdAsk
+        ? `<span class="rdask">Ab ${new Date().getHours()}:00 neu zählen? <button class="btn sm pri" data-a="rdresetok">Ja</button><button class="btn sm" data-a="rdresetno">Nein</button></span>`
+        : d.radio_reset ? `<button class="btn sm" data-a="rdresetoff">Wieder alles zeigen</button>` : `<button class="btn sm" data-a="rdreset">Zählung neu beginnen …</button>`;
+      const rows = all.map(({ t, room }) => {
+        const r = t.radio, sh = this._rdShare(r);
+        return `<tr data-a="radio" data-v="${esc(t.entity_id)}"><td><span class="rdot ${r.level || ""}" aria-label="${esc(this._radioWord(r))}"></span></td>
+          <td>${esc(t.name)}<small>${esc(room.name)}</small></td>
+          <td class="n">${r.cmd_total ? `${r.cmd_ok}/${r.cmd_total}` : "–"}</td>
+          <td class="n w">${sh == null ? "–" : `${sh} %`}</td>
+          <td class="n w">${r.cmd_total ? esc(this._rdMins(r.delay_max)) : "–"}</td>
+          <td class="n">${r.off_count ? `${r.off_count}× · ${esc(this._rdMins(r.off_seconds))}` : "–"}</td>
+          <td class="n w">${esc(this._rdAgo(r.last_seen))}</td></tr>`;
+      }).join("");
+      return `<div class="tile rdtab"><div class="rdhead"><b>Alle Thermostate · ${esc(since)}</b><span class="sp"></span>${reset}</div>
+        <div class="rdscroll"><table class="rdt"><thead><tr><th></th><th>Thermostat</th><th class="n">Befehle</th><th class="n w">Raumwert</th><th class="n w">längste Verz.</th><th class="n">nicht erreichbar</th><th class="n w">zuletzt gemeldet</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>
+        <p class="hint">„Befehle“ = Sollwert/Modus, den HomeRhythm gesendet hat, rechtzeitig übernommen (5 Min., FRITZ!DECT 20 Min.). „Raumwert“ = an das Thermostat gesendete Raumtemperatur (nur bei „Thermostat direkt“ mit Raumsensor). Gelb, wenn in diesem Zeitraum ein Befehl zu spät oder nicht ankam, das Gerät 3× oder öfter nicht erreichbar war oder unter 80 % der Raumwerte ankamen. Zeile antippen für Einzelheiten.
+        ${this._admin ? "„Zählung neu beginnen“ ist für Umbauten gedacht (z. B. neuer Zigbee-Stick): danach zählt nur, was seitdem passiert. Die 7-Tage-Ansicht behält die alten Tage." : ""}</p></div>`;
+    }
+
+    /** Fenster „Funk“ für ein Thermostat (aus Raum, Übersicht oder Reiter „Funk“). */
+    _renderRadio() {
+      const host = this.shadowRoot.getElementById("fdlg");
+      if (!host) return;
+      const hit = this._rdlg && this._radioAll().find((x) => x.t.entity_id === this._rdlg);
+      if (!hit) { host.innerHTML = ""; return; }
+      const { t, room } = hit, r = t.radio, lv = r.level || "", sh = this._rdShare(r);
+      const empty = !r.cmd_total && !r.rv_total && !r.off_count;
+      const verdict = empty ? ["n", "Noch keine Befehle in diesem Zeitraum"] : lv === "r" ? ["r", "Hängt gerade – ein Befehl ist nicht übernommen"]
+        : lv === "y" ? ["y", "Auffällig – der Funk zu diesem Thermostat ist unzuverlässig"] : ["", "Zuverlässig – alles rechtzeitig angekommen"];
+      const per = this._rdPer || "24";
+      const kv = `<div class="rdkv">
+          <div class="${r.cmd_total > r.cmd_ok ? "y" : ""}"><small>Befehle rechtzeitig übernommen</small><b>${r.cmd_total ? `${r.cmd_ok} von ${r.cmd_total}` : "–"}</b></div>
+          ${r.room_value || r.rv_total ? `<div class="${sh != null && sh < 80 && r.rv_total >= 5 ? "y" : ""}"><small>Raumwert angekommen</small><b>${r.rv_total ? `${r.rv_ok} von ${r.rv_total} (${sh} %)` : "–"}</b></div>` : ""}
+          <div class="${r.delay_max > r.limit ? "y" : ""}"><small>längste Verzögerung</small><b>${r.cmd_total ? esc(this._rdMins(r.delay_max)) : "–"}</b></div>
+          <div class="${r.off_count >= 3 ? "y" : ""}"><small>nicht erreichbar</small><b>${r.off_count ? `${r.off_count}× · ${esc(this._rdMins(r.off_seconds))}` : "nie"}</b></div>
+          <div><small>zuletzt gemeldet</small><b>${esc(this._rdAgo(r.last_seen))}</b></div></div>`;
+      // Band: Zeitraum (24 h oder seit Neubeginn) bis jetzt, Ereignisse als farbige Abschnitte
+      const t0 = Date.parse(r.from), t1 = NOW_REF ? Date.parse(NOW_REF) : Date.now(), span = Math.max(1, t1 - t0);
+      const COL = { late: "var(--warning-color,#ffa600)", rv: "var(--warning-color,#ffa600)", lost: "var(--error-color,#db4437)", hang: "var(--error-color,#db4437)", off: "var(--disabled-text-color,#9aa0a6)" };
+      const segs = (r.events || []).filter((e) => COL[e.k]).map((e) => {
+        const a = Math.max(t0, Date.parse(e.s)), b = Math.min(t1, e.e ? Date.parse(e.e) : t1);
+        return `<i style="left:${(((a - t0) / span) * 100).toFixed(2)}%;width:${Math.max(0, ((b - a) / span) * 100).toFixed(2)}%;background:${COL[e.k]}"></i>`;
+      }).join("");
+      const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => `<span>${f === 1 ? "jetzt" : esc(this._rdClock(new Date(t0 + f * span).toISOString()))}</span>`).join("");
+      const band = empty ? "" : `<div><div class="rdband" role="img" aria-label="Funk im Zeitraum">${segs}</div><div class="rdax">${ticks}</div></div>
+        <div class="rdlegend"><span><i style="background:var(--success-color,#43a047)"></i>ok</span><span><i style="background:var(--warning-color,#ffa600)"></i>verspätet</span><span><i style="background:var(--error-color,#db4437)"></i>nicht übernommen</span><span><i style="background:var(--disabled-text-color,#9aa0a6)"></i>nicht erreichbar</span></div>`;
+      const days = `<div class="rddays">${(r.days || []).map((x) => { const dd = new Date(`${x.date}T12:00:00`);
+          return `<div class="rdday"><span>${esc(dd.toLocaleDateString("de-DE", { weekday: "short" }))}</span><span class="rdbar">${x.share == null ? "" : `<i class="${x.share < 80 ? "r" : x.share < 95 ? "y" : ""}" style="width:${x.share}%"></i>`}</span><span style="text-align:right">${x.share == null ? "–" : `${x.share} %`}${x.off ? ` · ${x.off}× weg` : ""}</span></div>`; }).join("")}</div>
+        <p class="hint" style="margin:0">Anteil der Befehle und Raumwerte, die je Tag rechtzeitig ankamen. So siehst du z. B. nach einem Umbau, ob es besser wird.</p>`;
+      const tries = (n) => `${n} ${n === 1 ? "Versuch" : "Versuche"}`;
+      const evText = (e) => {
+        const dur = e.e ? this._rdMins((Date.parse(e.e) - Date.parse(e.s)) / 1000) : "";
+        switch (e.k) {
+          case "late": return ["y", `${e.want || "Wert"} erst nach ${dur} übernommen – ${tries(e.tries || 1)}`];
+          case "lost": return ["r", `${e.want || "Wert"} nie übernommen – ${tries(e.tries || 1)}${e.why ? ` (${e.why})` : ""}`];
+          case "hang": return ["r", `${e.want || "Wert"} gesendet – noch nicht übernommen (${tries(e.tries || 1)})`];
+          case "off": return ["o", e.e ? `${dur} nicht erreichbar` : "nicht erreichbar – dauert an"];
+          case "rv": return ["y", `${e.n || 1}× Raumwert nicht angekommen`];
+          case "old": return ["y", `alter Befehl ${e.want || ""} kam verspätet an – nicht als Hand-Änderung gewertet`];
+          default: return ["", ""];
+        }
+      };
+      const evs = (r.events || []).map((e) => { const [c, x] = evText(e); return x ? `<div class="${c}"><small>${esc(this._rdClock(e.s))}</small>${esc(x)}</div>` : ""; }).join("");
+      const why = (r.why || []).length ? `<div class="rdwhy ${lv}"><b>Warum ${lv === "r" ? "rot" : "gelb"}?</b> ${esc(r.why.join("; "))}.</div>` : "";
+      const help = lv ? `<p class="hint" style="margin:0">Was hilft: näher an einen Zigbee-Router (Gerät mit Netzstrom, z. B. Zwischenstecker), Batterie prüfen, in Zigbee2MQTT auf der Netzwerkkarte nachsehen, über welchen Router das Gerät hängt.</p>` : "";
+      host.innerHTML = `<div class="ov" data-a="rdov"><div class="dlg rddlg" role="dialog" aria-modal="true" aria-label="Funk ${esc(t.name)}">
+        <header><h2>${esc(t.name)}</h2><button class="x" data-a="rdclose" aria-label="Schließen">✕</button></header>
+        <div class="rdbody">
+          <div class="hint">${esc(room.name)}${room.kind === "fritz" ? " · FRITZ!DECT meldet sich nur alle paar Minuten – bis 20 Min. Verzögerung sind dort normal." : ""}</div>
+          ${t.not_taken ? this._stuckHtml({ climates: [t] }) : ""}
+          <div class="rdsh"><h3>Funk${this._data.radio_reset ? ` · gezählt seit ${esc(this._rdClock(this._data.radio_reset))}` : ""}</h3>${[["24", "24 h"], ["7", "7 Tage"]].map(([k, n]) => `<button class="seg ${per === k ? "on" : ""}" data-a="rdper" data-v="${k}">${n}</button>`).join("")}</div>
+          <div class="rdverdict"><span class="rdot ${verdict[0]}"></span><span>${esc(verdict[1])}</span></div>
+          ${per === "24" ? kv + band : days}
+          ${why}
+          ${per === "24" && evs ? `<div><div class="hint" style="margin-bottom:6px">Ereignisse (neueste oben)</div><div class="rdev">${evs}</div></div>` : ""}
+          ${help}
+          <p class="hint" style="margin:0">Gezählt wird nur, was HomeRhythm selbst an dieses Thermostat sendet.</p>
+        </div>
+        <footer><button class="btn" data-a="more" data-v="${esc(t.entity_id)}">Thermostat öffnen</button><span class="sp"></span><button class="btn pri" data-a="rdclose">Schließen</button></footer>
+      </div></div>`;
     }
 
     _mismatch(room) {
@@ -1469,7 +1647,7 @@
       return `<div class="room ${open ? "open" : ""}">
         <div class="row" data-a="toggle" data-v="${esc(room.id)}">
           ${noHeat ? `<span class="ico" title="${esc(icoTitle)}">${ico}</span>` : `<button class="ico icob" data-a="ctl" data-v="${esc(room.id)}" title="${esc(icoTitle)} – Thermostat einstellen">${ico}</button>`}
-          <div class="name">${esc(room.name)}${room.today || room.active_rule ? ` <span class="star" title="${esc(room.today ? (room.today.planned ? "Ausnahme geplant" : "Heute anders / Ausnahme") : room.active_rule)}">★</span>` : ""}${this._stuckMark(room) || ((room.hints || []).length ? ` <span class="warnmark" title="Wird auch von anderer Stelle gesteuert">⚠</span>` : "")}${(room.devices || []).some((x) => x.battery_low) ? ` <span class="batmark" title="Batterie schwach">🔋</span>` : ""}${room.humidity && room.humidity.value != null ? `<small class="hum" title="Luftfeuchte">💧 ${fmtNum(room.humidity.value, 0)} %</small>` : ""}</div>
+          <div class="name">${esc(room.name)}${room.today || room.active_rule ? ` <span class="star" title="${esc(room.today ? (room.today.planned ? "Ausnahme geplant" : "Heute anders / Ausnahme") : room.active_rule)}">★</span>` : ""}${this._stuckMark(room) || this._radioMark(room) || ((room.hints || []).length ? ` <span class="warnmark" title="Wird auch von anderer Stelle gesteuert">⚠</span>` : "")}${(room.devices || []).some((x) => x.battery_low) ? ` <span class="batmark" title="Batterie schwach">🔋</span>` : ""}${room.humidity && room.humidity.value != null ? `<small class="hum" title="Luftfeuchte">💧 ${fmtNum(room.humidity.value, 0)} %</small>` : ""}</div>
           <div class="num">${fmtTemp(c.current_temperature)}<small>Ist</small></div>
           <div class="num">${noHeat ? "–" : soll}<small>Soll</small></div>
           <div class="why">${noHeat ? "" : `<span class="lvl" style="background:${COLORS[lvl] || "#888"}">${esc(r.level_name || lvl)}${room.manual ? ` <button class="lx" data-a="clear" data-v="${esc(room.id)}" title="Hand-Änderung verwerfen – zurück zum Plan" aria-label="Zurück zum Plan">✕</button>` : ""}</span>`}${room.energy && r.hvac_mode !== "off" && ["plan", "hol", "man", "today", "party", "room"].includes(r.rule) ? `<span class="src ${room.energy.source}" title="${esc(room.energy.reason)}">${room.energy.source === "ac" ? (room.energy.boost ? "Klima + Gas" : "Klima") : "Gas"}</span>` : ""}<span class="txt">${esc(reason)}</span></div>
@@ -1535,7 +1713,7 @@
           <div class="dev"><span>Kosten pro kWh Wärme:</span> <b>Gas ${fmtNum(room.energy.cost_gas)} ct</b>${room.energy.cost_ac != null ? ` · <b>Klima ${fmtNum(room.energy.cost_ac)} ct</b> <span>(COP ${fmtNum(room.energy.cop_now, 2)} bei ${fmtNum(room.energy.outdoor)} °C)</span>` : ""}</div>` : ""}
           <div><span>Grund:</span> <b>${esc(r.reason || "–")}</b></div>
           <div><span>Gilt bis:</span> <b>${r.until ? esc(fmtTime(r.until)) : "–"}</b>${r.next_level_name ? ` <span>→ ${esc(r.next_level_name)}</span>` : ""}</div>
-          ${(room.climates || []).map((t) => `<div class="dev"><span>${t.result && t.result.rule === "man" ? "✋ " : ""}${esc(t.name)}${t.role === "ac" ? '<span class="badge">Klima</span>' : ""}:</span> ${(room.climates || []).length > 1 && t.result ? t.result.hvac_mode === "off" ? `<span>Soll aus ·</span> ` :  `<span>Soll ${fmtTemp(t.result.temperature)}${t.result.rule === "man" && t.result.until ? ` bis ${esc(fmtTime(t.result.until))}` : ""} ·</span> ` : ""}<b>${t.state === "unavailable" || t.state === "unknown" ? "nicht erreichbar" : t.state === "off" ? "aus" : `${fmtTemp(t.temperature)} eingestellt`}</b>${t.current_temperature != null ? ` <span>· Ist ${fmtTemp(t.current_temperature)}</span>` : ""}${t.hvac_action === "heating" ? " 🔥" : ""}${this._heatHtml(t.heat)}</div>`).join("")}
+          ${(room.climates || []).map((t) => `<div class="dev"><span>${t.result && t.result.rule === "man" ? "✋ " : ""}${esc(t.name)}${t.role === "ac" ? '<span class="badge">Klima</span>' : ""}:</span> ${(room.climates || []).length > 1 && t.result ? t.result.hvac_mode === "off" ? `<span>Soll aus ·</span> ` :  `<span>Soll ${fmtTemp(t.result.temperature)}${t.result.rule === "man" && t.result.until ? ` bis ${esc(fmtTime(t.result.until))}` : ""} ·</span> ` : ""}<b>${t.state === "unavailable" || t.state === "unknown" ? "nicht erreichbar" : t.state === "off" ? "aus" : `${fmtTemp(t.temperature)} eingestellt`}</b>${t.current_temperature != null ? ` <span>· Ist ${fmtTemp(t.current_temperature)}</span>` : ""}${t.hvac_action === "heating" ? " 🔥" : ""}${this._radioLink(t)}${this._heatHtml(t.heat)}</div>`).join("")}
           ${m ? `<div><span>Hand-Änderung:</span> <b>${esc(m.source || "")}</b></div>` : ""}
         </div>
         ${this._rtHtml(room)}
@@ -1802,7 +1980,7 @@
           <div class="tile setc"><span class="sico">🧭</span><div><b>Hausmodi, Helfer &amp; Energie</b><div class="hint">Jahreszeit, Urlaub, Arbeitstag, Anwesenheit, Außensensoren, Gas- und Strompreis</div></div>
             <button class="btn" data-a="nav" data-v="/config/integrations/integration/home_rhythm">In HA öffnen</button></div>
           <div class="tile setc"><span class="sico">🗂️</span><div><b>Start-Reiter</b><div class="hint">Mit welchem Reiter HomeRhythm öffnet (für alle Nutzer).</div></div>
-            <select data-a="starttab">${[["overview", "Übersicht"], ["heat", "Heizung & Klima"], ["flows", "Abläufe"], ["devices", "Geräte"], ["setup", "Einrichtung"]].map(([k, n]) => `<option value="${k}" ${(d.start_tab || "overview") === k ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+            <select data-a="starttab">${[["overview", "Übersicht"], ["heat", "Heizung & Klima"], ["flows", "Abläufe"], ["devices", "Geräte"], ["radio", "Funk"], ["setup", "Einrichtung"]].map(([k, n]) => `<option value="${k}" ${(d.start_tab || "overview") === k ? "selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="tile setc"><span class="sico">💾</span><div><b>Sicherung</b><div class="hint">Räume, Stufen und Abläufe als Datei. Protokolle, Hand-Änderungen und Benutzernamen sind nicht enthalten.</div>${this._importMsg ? `<div class="hint"><b>${esc(this._importMsg)}</b></div>` : ""}</div>
             <span class="btnrow"><button class="btn" data-a="export">Export</button><label class="btn">Import<input type="file" accept=".json,application/json" data-a="import" hidden></label></span></div>
           <div class="tile setc"><span class="sico">ℹ️</span><div><b>HomeRhythm ${esc(VERSION)}</b><div class="hint">Läuft komplett lokal in Home Assistant – keine Cloud, keine Daten nach außen.</div></div>
@@ -2199,7 +2377,7 @@
         let ico, icoT;
         if (atNow) [ico, icoT] = this._icon(lr);
         else [ico, icoT] = r.manual ? ["✋", "Hand-Änderung"] : off ? ["⏻", "aus"] : r.level === "nacht" ? ["🌙", "Nacht"] : r.level === "absenkung" ? ["💤", "Absenkung"] : r.level === "urlaub" ? ["🧳", "Urlaub"] : ["🔥", "warm (Komfort o. ä.)"];
-        const marks = `${lr.today || lr.active_rule ? ` <span class="star">★</span>` : ""}${(atNow && this._stuckMark(lr)) || ((lr.hints || []).length ? ` <span class="warnmark">⚠</span>` : "")}${(lr.devices || []).some((x) => x.battery_low) ? ` <span class="batmark">🔋</span>` : ""}`;
+        const marks = `${lr.today || lr.active_rule ? ` <span class="star">★</span>` : ""}${(atNow && (this._stuckMark(lr) || this._radioMark(lr))) || ((lr.hints || []).length ? ` <span class="warnmark">⚠</span>` : "")}${(lr.devices || []).some((x) => x.battery_low) ? ` <span class="batmark">🔋</span>` : ""}`;
         const next = r.next_at ? ` · bis ${r.next_at.slice(0, 10) !== at.date ? "morgen " : ""}${r.next_at.slice(11, 16)}, dann ${r.next_level_name || ""}${r.next_temp != null ? ` ${fmtNum(r.next_temp)} °C` : ""}` : "";
         const why = atNow && lr.manual ? `✋ von Hand bis ${fmtTime(lr.manual.until)}` : `${r.reason || ""}${next}`;
         const lvl = off ? "aus" : r.level;
@@ -4135,6 +4313,17 @@
       if (a === "knav") { this._knopfNav(); return; }
       if (a.startsWith("rc") && await this._rcClick(a, v, t)) return;
       if (["mode", "field", "lvl", "blk", "search", "thermo", "offset", "role", "ac", "cop", "cool", "event", "rule", "lvldef", "rtsrc", "rtsens", "rtbox", "rtcval", "ctladd", "ctlmap"].includes(a)) return;
+      if (a === "radio") { e.stopPropagation(); this._rdlg = v; this._rdPer = "24"; this._renderRadio(); return; }  // 0.9.17
+      if (a === "rdov") { if (e.target === t) { this._rdlg = null; this._renderRadio(); } return; }
+      if (a === "rdclose") { this._rdlg = null; this._renderRadio(); return; }
+      if (a === "rdper") { this._rdPer = v; this._renderRadio(); return; }
+      if (a === "rdreset") { this._rdAsk = true; this._render(); return; }
+      if (a === "rdresetno") { this._rdAsk = false; this._render(); return; }
+      if (a === "rdresetok" || a === "rdresetoff") {
+        this._rdAsk = false;
+        try { await this._ws({ type: "home_rhythm/radio/reset", on: a === "rdresetok" }); } catch (err) { /* Anzeige bleibt */ }
+        await this._fetch(); return;
+      }
       if (a === "tab") { this._tab = v; this._render(); }
       else if (a === "filter") { this._filter = v; this._render(); }
       else if (a === "toggle") {
@@ -4168,6 +4357,7 @@
         this._ctlMenu = null;
         // Unser Fenster ist modal (Top Layer); das HA-Fenster läge sonst dahinter und wäre gesperrt → Bedien-Fenster schließen.
         if (this._q) { this._q = null; this._renderQ(); }
+        if (this._rdlg) { this._rdlg = null; this._renderRadio(); }
         this._moreInfo(v);
       }
       else if (a === "edit") this._openEditor(v);
@@ -4391,7 +4581,7 @@
           ${quick.filter((k) => qAll.some(([x]) => x === k)).map((k, i, arr) => `<div class="q"><input type="checkbox" checked data-q="${k}"> ${esc(qAll.find(([x]) => x === k)[1])}
             <button data-up="${i}" ${i ? "" : "disabled"} title="nach oben">▲</button><button data-down="${i}" ${i < arr.length - 1 ? "" : "disabled"} title="nach unten">▼</button></div>`).join("")}
           ${qAll.filter(([k]) => !quick.includes(k)).map(([k, n]) => `<div class="q"><input type="checkbox" data-q="${k}"> ${esc(n)}</div>`).join("")}</div>`}` : `
-        <div class="f"><label class="t">Start-Reiter</label><select data-k="view"><option value="">wie in der Einrichtung</option>${[["overview", "Übersicht"], ["heat", "Heizung & Klima"], ["flows", "Abläufe"], ["devices", "Geräte"]].map(([v, n]) => `<option value="${v}" ${c.view === v ? "selected" : ""}>${n}</option>`).join("")}</select></div>`}`;
+        <div class="f"><label class="t">Start-Reiter</label><select data-k="view"><option value="">wie in der Einrichtung</option>${[["overview", "Übersicht"], ["heat", "Heizung & Klima"], ["flows", "Abläufe"], ["devices", "Geräte"], ["radio", "Funk"]].map(([v, n]) => `<option value="${v}" ${c.view === v ? "selected" : ""}>${n}</option>`).join("")}</select></div>`}`;
       const root = this.shadowRoot;
       root.querySelectorAll("select[data-k]").forEach((el) => el.addEventListener("change", () => this._set({ [el.dataset.k]: el.value })));
       root.querySelectorAll("button[data-by]").forEach((el) => el.addEventListener("click", () => {

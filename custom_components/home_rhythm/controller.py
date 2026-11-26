@@ -27,6 +27,7 @@ from . import flows as F
 from . import requirements as R
 from . import controls as CT
 from . import roomtemp as RT
+from .radio import RadioLog
 from .const import (
     CONF_HOLIDAY_AS,
     CONF_VACATION_AS,
@@ -59,6 +60,7 @@ from .const import (
     SLOW_ECHO_SECONDS,
     STUCK_SECONDS,
     STUCK_SECONDS_SLOW,
+    STARTUP_GRACE_SECONDS,
     START_TABS,
     MAX_EXCEPTION_DAYS,
     SIGNAL_UPDATED,
@@ -169,6 +171,9 @@ class HomeRhythmController:
         self._season_checked: str | None = None
         self._season_set: tuple[str, datetime] | None = None  # zuletzt automatisch gesetzt (Echo nicht als "von Hand" werten)
         self._lock = asyncio.Lock()  # Abgleiche nie überlappend (Tick, Hand-Änderung, Speichern)
+        # 0.9.17 Funk-Zuverlässigkeit je Thermostat (Zählung 7 Tage, übersteht Neustarts)
+        self.radio = RadioLog()
+        self._started_at = dt_util.utcnow()
 
     # ------------------------------------------------------------------ Konfiguration
     @property
@@ -214,6 +219,7 @@ class HomeRhythmController:
         E.apply_level_defs(self.level_defs)
         self.daily_temps = data.get("daily_temps") or {}
         self.observations = {k: v for k, v in (data.get("observations") or {}).items() if isinstance(v, list)}
+        self.radio.load(data.get("radio"))
         for room in self.rooms.values():  # Migration 0.1.0 → 0.2.0
             room["climate_entities"] = room_entities(room)
             room.pop("climate_entity", None)
@@ -254,6 +260,7 @@ class HomeRhythmController:
                 "req_none": sorted(self.req_none),
                 "start_tab": self.start_tab,
                 "observations": self.observations,
+                "radio": self.radio.dump(),
                 "overrides": {
                     rid: {"kind": o.kind, "until": o.until.isoformat(), **({"level": o.level} if o.level else {}), **({"start": o.start.isoformat()} if o.start else {})}
                     for rid, o in self.overrides.items()
@@ -284,6 +291,7 @@ class HomeRhythmController:
             self._user_names = {}
 
     async def async_start(self) -> None:
+        self._started_at = dt_util.utcnow()  # „nicht erreichbar“ erst nach der Startphase zählen
         await self._async_load_users()
         self._unsubs.append(
             async_track_time_interval(self.hass, self._async_tick_cb, timedelta(seconds=TICK_SECONDS))
@@ -460,6 +468,7 @@ class HomeRhythmController:
             changed = changed or acc[1] % 30 == 1  # etwa jede halbe Stunde speichern
         if self.season_auto and self._season_checked != now.date().isoformat() and now.hour >= 4:
             await self.async_apply_season_auto()
+        self.radio.prune(dt_util.utcnow())
         try:
             await self._async_room_temps(now)
         except Exception:  # noqa: BLE001 – Senden/Beobachten darf die übrige Steuerung nie aufhalten
@@ -992,6 +1001,7 @@ class HomeRhythmController:
             if last and last.get("rule") == result.rule:
                 return  # in dieser Phase schon gehandelt (ausgeschaltet oder Hand-Änderung gemerkt)
             if self._matches(state, want):
+                self._clear_stuck(key, entity_id)
                 self._last_sent[key] = {"want": want, "at": now, "rule": result.rule}
                 return
             await self._async_send(key, entity_id, state, want, result.rule)
@@ -1059,8 +1069,36 @@ class HomeRhythmController:
             return
         if last.get("warned"):
             _LOGGER.info("HomeRhythm: %s hat den Sollwert jetzt übernommen", entity_id)
-        for k in ("since", "tries", "warned"):
+        # 0.9.17: für die Funk-Zählung – wann das Gerät den Wert wirklich gemeldet hat (sonst: jetzt, beim Abgleich)
+        done = last.get("taken_at") or dt_util.utcnow()
+        self.radio.command_done(entity_id, last["since"], done, int(last.get("tries") or 1),
+                                self._stuck_limit(key.split("|", 1)[0]), self._want_txt(last["want"]))
+        self.schedule_save()
+        for k in ("since", "tries", "warned", "taken_at", "olds"):
             last.pop(k, None)
+
+    @staticmethod
+    def _want_txt(want: dict[str, Any] | None) -> str:
+        if not want:
+            return ""
+        if want.get("hvac") == "off":
+            return "aus"
+        t = want.get("temp")
+        return f"{t:.1f} °C".replace(".", ",") if isinstance(t, (int, float)) else ""
+
+    def _end_episode(self, key: str, why: str) -> None:
+        """0.9.17: Ein noch nicht übernommener Befehl wird verworfen (Hand-Änderung, Raum gespeichert …).
+
+        War er schon über der Grenze unterwegs, zählt er als „nicht übernommen“; sonst zählt er gar nicht.
+        """
+        last = self._last_sent.get(key)
+        if not last or not last.get("since"):
+            return
+        room_id, entity_id = key.split("|", 1)
+        now = dt_util.utcnow()
+        if (now - last["since"]).total_seconds() >= self._stuck_limit(room_id):
+            self.radio.command_lost(entity_id, last["since"], now, int(last.get("tries") or 1), self._want_txt(last["want"]), why)
+            self.schedule_save()
 
     async def _async_send(self, key: str, entity_id: str, state, want: dict[str, Any], rule: str | None = None) -> None:
         ctx = Context()
@@ -1076,6 +1114,10 @@ class HomeRhythmController:
             "since": before.get("since") or dt_util.utcnow(),
             "tries": int(before.get("tries") or 0) + 1,
             "warned": before.get("warned", False),
+            # 0.9.17: frühere, noch nicht angekommene Werte dieses Vorfalls – kommt einer davon verspätet an,
+            # ist das keine Hand-Änderung (Zigbee2MQTT liefert gescheiterte Befehle teils bis zu 1 Std. später)
+            "olds": ([*before.get("olds", []), [before["want"].get("hvac"), before["want"].get("temp")]][-6:]
+                     if before.get("since") and before.get("want") and before["want"] != want else list(before.get("olds", []))),
         }
         hvac_modes = state.attributes.get("hvac_modes") or []
         try:
@@ -1287,13 +1329,36 @@ class HomeRhythmController:
         self._note_heating(event.data["entity_id"], new)
         if old is None or new is None:
             return
-        if new.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+        gone = (STATE_UNAVAILABLE, STATE_UNKNOWN)
+        if new.state in gone:
+            # 0.9.17: zählt als Funkproblem – aber nicht in der Startphase (nach einem Neustart sind alle kurz weg)
+            if old.state not in gone and (dt_util.utcnow() - self._started_at).total_seconds() > STARTUP_GRACE_SECONDS:
+                self.radio.went_offline(event.data["entity_id"], dt_util.utcnow())
+                self.schedule_save()
             return
-        if old.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+        if old.state in gone:
             # Gerät kommt (wieder) online – keine Hand-Änderung, beim nächsten Abgleich neu senden
+            self.radio.back_online(event.data["entity_id"], dt_util.utcnow())
+            self.schedule_save()
             for rid in self.rooms:
-                self._last_sent.pop(f"{rid}|{event.data['entity_id']}", None)
+                key = f"{rid}|{event.data['entity_id']}"
+                last = self._last_sent.get(key)
+                if last and last.get("since"):
+                    # 0.9.17: ein noch nicht übernommener Befehl bleibt derselbe Vorfall (Zählung „seit“ läuft weiter),
+                    # wird aber sofort erneut gesendet – außer das Gerät meldet ihn jetzt schon
+                    if self._matches(new, last["want"]):
+                        last.setdefault("taken_at", dt_util.utcnow())
+                    else:
+                        last["at"] = dt_util.utcnow() - timedelta(seconds=RESYNC_SECONDS)
+                    last.pop("prev", None)
+                else:
+                    self._last_sent.pop(key, None)
             return
+        # 0.9.17: Zeitpunkt merken, zu dem ein hängender Befehl wirklich ankam (für „längste Verzögerung“)
+        for rid in self.rooms:
+            last = self._last_sent.get(f"{rid}|{event.data['entity_id']}")
+            if last and last.get("since") and not last.get("taken_at") and self._matches(new, last["want"]):
+                last["taken_at"] = dt_util.utcnow()
         if old.state == new.state and old.attributes.get(ATTR_TEMPERATURE) == new.attributes.get(ATTR_TEMPERATURE):
             return  # nur Ist-Temperatur o. Ä. geändert
         ctx = event.context
@@ -1312,6 +1377,13 @@ class HomeRhythmController:
                 return  # Echo eines eigenen Befehls von einem trägen Gerät
             if age < SLOW_ECHO_SECONDS and not ctx.user_id and not ctx.parent_id and self._is_old_value(new, last):
                 return  # Fritz!DECT meldet nach dem Aufwachen noch einmal den alten Wert – keine Hand-Änderung
+            if last.get("since") and not ctx.user_id and not ctx.parent_id and self._is_late_own(new, last):
+                # 0.9.17: ein eigener, schon überholter Befehl kam verspätet an → keine Hand-Änderung, Plan neu senden
+                self.radio.old_value_late(entity_id, dt_util.utcnow(), self._want_txt({"hvac": new.state, "temp": _num(new.attributes.get(ATTR_TEMPERATURE))}))
+                last["at"] = dt_util.utcnow() - timedelta(seconds=RESYNC_SECONDS)
+                self.schedule_save()
+                self.hass.async_create_task(self.async_update(apply=True))
+                return
         result = self.dev_results.get(f"{room_id}|{entity_id}") or self.results.get(room_id)
         hvac = new.state if new.state in ("heat", "off", "cool", "dry", "fan_only", "heat_cool", "auto") else "heat"
         temp = new.attributes.get(ATTR_TEMPERATURE)
@@ -1354,6 +1426,7 @@ class HomeRhythmController:
             since=now,
         )
         # Das geänderte Gerät hat den Wert schon – nicht erneut senden.
+        self._end_episode(f"{room_id}|{entity_id}", "Hand-Änderung")
         self._last_sent[f"{room_id}|{entity_id}"] = {
             "want": {"hvac": hvac, "temp": None if hvac == "off" else _num(temp)},
             "at": dt_util.utcnow() - timedelta(seconds=GRACE_SECONDS),
@@ -1388,6 +1461,20 @@ class HomeRhythmController:
             return float(state.attributes.get(ATTR_TEMPERATURE)) >= float(state.attributes.get("max_temp"))
         except (TypeError, ValueError):
             return False
+
+    def _is_late_own(self, new, last: dict[str, Any]) -> bool:
+        """0.9.17: Meldet das Gerät einen früheren Wert, den HomeRhythm in diesem Vorfall gesendet hatte?"""
+        cur = _num(new.attributes.get(ATTR_TEMPERATURE))
+        for hvac, temp in last.get("olds") or []:
+            if hvac == "off":
+                if new.state == "off":
+                    return True
+                continue
+            if new.state == "off" or cur is None or temp is None:
+                continue
+            if abs(cur - float(temp)) <= self._tolerance(new):
+                return True
+        return False
 
     def _is_old_value(self, new, last: dict[str, Any]) -> bool:
         """Meldet das Gerät genau den Wert von VOR unserem letzten Befehl?"""
@@ -1553,6 +1640,7 @@ class HomeRhythmController:
 
     def _forget_sent(self, room_id: str) -> None:
         for key in [k for k in self._last_sent if k.startswith(f"{room_id}|")]:
+            self._end_episode(key, "neu gesendet nach Änderung")
             self._last_sent.pop(key, None)
 
     def _forget_manual(self, room_id: str) -> None:
@@ -2003,6 +2091,40 @@ class HomeRhythmController:
             return "integration", [sensor]
         return "device", []
 
+    # ------------------------------------------------------------------ Funk (0.9.17)
+    def _last_seen(self, entity_id: str) -> datetime | None:
+        """Zuletzt vom Gerät gehört: Sensor „Last seen“ (Zigbee2MQTT, falls aktiviert), sonst letzte Meldung in HA."""
+        ent_reg = er.async_get(self.hass)
+        entry = ent_reg.async_get(entity_id)
+        if entry and entry.device_id:
+            for e in er.async_entries_for_device(ent_reg, entry.device_id):
+                if e.domain == "sensor" and e.entity_id.endswith("_last_seen") and not e.disabled_by:
+                    st = self.hass.states.get(e.entity_id)
+                    if st and (t := dt_util.parse_datetime(str(st.state))):
+                        return t
+        st = self.hass.states.get(entity_id)
+        if st is None or st.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            return None
+        return getattr(st, "last_reported", None) or st.last_updated
+
+    def radio_info(self, room_id: str, entity_id: str) -> dict[str, Any]:
+        last = self._last_sent.get(f"{room_id}|{entity_id}") or {}
+        pending = ({"since": last["since"], "tries": int(last.get("tries") or 1), "want": self._want_txt(last.get("want"))}
+                   if last.get("since") and not last.get("taken_at") else None)  # angekommen, nur noch nicht verbucht
+        st = self.hass.states.get(entity_id)
+        if st is not None and st.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            pending = None  # „nicht erreichbar“ zählt eigens; rotes ⚠ wie bisher erst, wenn es wieder da ist
+        info = self.radio.summary(entity_id, dt_util.utcnow(), self._stuck_limit(room_id), pending, self._last_seen(entity_id))
+        info["limit"] = self._stuck_limit(room_id)
+        info["room_value"] = bool(RT.push_targets(self.hass, entity_id)[0]) if RT.pushes(self.rooms.get(room_id) or {}) else False
+        return info
+
+    async def async_radio_reset(self, on: bool) -> None:
+        """„Zählung neu beginnen“ (z. B. nach einem Stick-Wechsel) – ab der vollen Stunde; aus = wieder alles zeigen."""
+        self.radio.reset_at = dt_util.utcnow().replace(minute=0, second=0, microsecond=0) if on else None
+        await self.async_save()
+        self.notify_update()
+
     def rooms_light(self) -> list[dict[str, Any]]:
         """0.9.13: leichte Raumliste für andere Karten (HomeCockpit) – ohne Verlauf, Hinweise, Geräte."""
         out = []
@@ -2041,6 +2163,8 @@ class HomeRhythmController:
                 "unavailable": bool(bad) and bool(ents),
                 # 0.9.16: ein Thermostat übernimmt den gesendeten Sollwert seit Minuten nicht (z. B. Funkproblem)
                 "not_taken": any(self.stuck_info(room_id, e) for e in ents),
+                # 0.9.17: Funk in den letzten 24 h auffällig (gelbes ⚠)
+                "radio_warn": any(self.radio_info(room_id, e)["level"] for e in ents if not self.gone(e)),
             })
         return out
 
@@ -2068,6 +2192,7 @@ class HomeRhythmController:
                         "result": self._res(self.dev_results.get(f"{room_id}|{eid}")),
                         "heat": None if (g := self.gone(eid)) else self.heat_info(eid),
                         "not_taken": self.stuck_info(room_id, eid),
+                        "radio": None if g else self.radio_info(room_id, eid),
                         "gone": g,
                     }
                 )
@@ -2253,6 +2378,7 @@ class HomeRhythmController:
             "control_candidates": self.controls.candidates(),
             "default_temps": E.DEFAULT_LEVEL_TEMPS,
             "now": dt_util.now().isoformat(),
+            "radio_reset": self.radio.reset_at.isoformat() if self.radio.reset_at else None,  # 0.9.17
         }
 
     def _humidity_sensor_list(self) -> list[dict[str, Any]]:
@@ -2411,6 +2537,8 @@ class HomeRhythmController:
         nst = self.hass.states.get(num)
         if nst is None or nst.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             return
+        # 0.9.17: ist der zuletzt gesendete Raumwert angekommen? (Zigbee2MQTT meldet ihn nach dem Setzen zurück)
+        self.radio.rv_check(entity_id, _num(nst.state), dt_util.utcnow())
         lo, hi = _num(nst.attributes.get("min")), _num(nst.attributes.get("max"))
         if lo is not None:
             value = max(value, lo)
@@ -2420,6 +2548,10 @@ class HomeRhythmController:
             try:
                 await self.hass.services.async_call("number", "set_value", {"entity_id": num, "value": value}, blocking=False, context=Context())
                 self._pushed[entity_id] = {"value": value, "at": now}
+                # Nur Änderungen zählen: meldet das Gerät denselben Wert schon, lässt sich nichts nachweisen.
+                cur = _num(nst.state)
+                if cur is None or abs(cur - value) >= 0.05:
+                    self.radio.rv_sent(entity_id, num, value, dt_util.utcnow())
             except Exception as err:  # noqa: BLE001 – Senden darf die Regelung nie stören
                 _LOGGER.warning("HomeRhythm: Raumwert an %s nicht gesendet: %s", num, err)
         if sel and (sst := self.hass.states.get(sel)) and sst.state != RT.REMOTE_OPTION and RT.REMOTE_OPTION in (sst.attributes.get("options") or []):

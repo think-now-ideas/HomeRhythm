@@ -1,5 +1,31 @@
 # Änderungen
 
+## 0.9.17 – Funk-Zuverlässigkeit
+- **Neuer Reiter „Funk“:** alle Thermostate in einer Liste, auffällige oben – wie viele Befehle (Sollwert/Modus)
+  rechtzeitig ankamen, wie viele Raumwerte ankamen, längste Verzögerung, wie oft und wie lange „nicht erreichbar“,
+  zuletzt gemeldet. Zeile antippen öffnet das Fenster „Funk“ des Thermostats.
+- **Fenster „Funk“ je Thermostat** (auch über „📶 Funk …“ im aufgeklappten Raum): Urteil (zuverlässig / auffällig /
+  hängt), Zahlen, ein Band über 24 Stunden (ok, verspätet, nicht übernommen, nicht erreichbar), Ereignisse mit
+  Uhrzeit, „Warum gelb/rot?“ und eine 7-Tage-Ansicht (Anteil je Tag) – damit sieht man z. B. nach einem Umbau des
+  Zigbee-Netzes, ob es besser wird.
+- **Gelbes ⚠ am Raum**, wenn der Funk in den letzten 24 Stunden auffällig war: ein Befehl kam erst nach über
+  5 Minuten (FRITZ!DECT 20 Minuten) oder gar nicht an, das Gerät war 3× oder öfter nicht erreichbar oder weniger als
+  80 % der Raumwerte kamen an. Das rote ⚠ „übernimmt den Sollwert nicht“ aus 0.9.16 bleibt unverändert und hat Vorrang.
+  Ohne Auffälligkeit zeigt die Standardansicht nichts Neues.
+- **Zähler 📶 in der Übersicht** (z. B. „📶 5/7“ = 5 von 7 Thermostaten zuverlässig); antippen zeigt die auffälligen.
+  Über ⚙ ausblendbar.
+- **„Zählung neu beginnen“** (nur Administratoren), z. B. nach dem Wechsel des Zigbee-Sticks: danach zählt nur, was
+  ab der vollen Stunde passiert; „Wieder alles zeigen“ hebt das auf. Die 7-Tage-Ansicht behält die alten Tage.
+- **Lücken aus 0.9.16 geschlossen:** War ein Gerät zwischendurch kurz „nicht erreichbar“, begann die Zählung „seit“
+  von vorn – jetzt bleibt es derselbe Vorfall, und der Wert wird sofort erneut gesendet. Kommt ein eigener, schon
+  überholter Befehl verspätet an (Zigbee2MQTT liefert gescheiterte Befehle teils bis zu einer Stunde später), gilt
+  das nicht mehr als Hand-Änderung; der Plan wird erneut gesendet. Echte Änderungen am Gerät bleiben Hand-Änderungen.
+- Die Zählung übersteht Neustarts (gespeichert je Stunde, 7 Tage). In den ersten 5 Minuten nach dem Start von Home
+  Assistant zählt „nicht erreichbar“ nicht (dann sind alle Geräte kurz weg).
+- `home_rhythm/state` liefert je Thermostat `radio`, `home_rhythm/rooms` zusätzlich `radio_warn`; neuer Befehl
+  `home_rhythm/radio/reset`. „Funk“ ist als Start-Reiter wählbar.
+- Release-Titel heißt jetzt „HomeRhythm <Version>“ (bisher „Home Rhythm“).
+
 ## 0.9.16 – Thermostat übernimmt nicht
 - **Rotes ⚠ am Raum, wenn ein Thermostat den gesendeten Sollwert nicht übernimmt** – erst nach 5 Minuten
   (FRITZ!DECT: 20 Minuten, die wachen nur alle paar Minuten auf), sonst ist nichts zu sehen. Typische Ursache ist
